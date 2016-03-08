@@ -1,0 +1,1 @@
+include ':app', ':viewonmeasure', ':customview_01', ':customview_02', ':customview_03', ':customview_04', ':customviewgroup_01', ':scrollerdemo', ':dragview', ':viewmechanism'

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.jarvischen.customview_02.TopBar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:id="@+id/topBar"
+    custom:leftBackground="@android:color/darker_gray"
+    custom:leftText="back"
+    custom:leftTextColor="@color/colorAccent"
+
+    custom:rightBackground="@android:color/darker_gray"
+    custom:rightText="more"
+    custom:rightTextColor="@color/colorPrimary"
+
+    custom:titleCustom="自定义标题"
+    custom:titleTextSize="10sp"
+    custom:titleTextColorCustom="@color/colorPrimaryDark"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!" />
+</me.jarvischen.customview_02.TopBar>

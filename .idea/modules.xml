@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidHeroesLearning.iml" filepath="$PROJECT_DIR$/AndroidHeroesLearning.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/customview_01/customview_01.iml" filepath="$PROJECT_DIR$/customview_01/customview_01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/customview_02/customview_02.iml" filepath="$PROJECT_DIR$/customview_02/customview_02.iml" />
+      <module fileurl="file://$PROJECT_DIR$/customview_03/customview_03.iml" filepath="$PROJECT_DIR$/customview_03/customview_03.iml" />
+      <module fileurl="file://$PROJECT_DIR$/customview_04/customview_04.iml" filepath="$PROJECT_DIR$/customview_04/customview_04.iml" />
+      <module fileurl="file://$PROJECT_DIR$/customviewgroup_01/customviewgroup_01.iml" filepath="$PROJECT_DIR$/customviewgroup_01/customviewgroup_01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dragview/dragview.iml" filepath="$PROJECT_DIR$/dragview/dragview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scrollerdemo/scrollerdemo.iml" filepath="$PROJECT_DIR$/scrollerdemo/scrollerdemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/viewmechanism/viewmechanism.iml" filepath="$PROJECT_DIR$/viewmechanism/viewmechanism.iml" />
+      <module fileurl="file://$PROJECT_DIR$/viewonmeasure/viewonmeasure.iml" filepath="$PROJECT_DIR$/viewonmeasure/viewonmeasure.iml" />
+    </modules>
+  </component>
+</project>
