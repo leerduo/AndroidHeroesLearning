@@ -949,3 +949,384 @@ public class DisplayUtils {
 }
 ```
 最后两个是通过TypedValue类帮助转换的。
+
+## 2D绘图基础
+
+系统通过提供的Canvas对象来提供绘图方法。它提供了各种绘制图像的API,如drawPoint(点)、drawLine(线)、drawRect(矩形)、
+drawVertices(多边形)、drawArc(弧)、drawCircle(圆)、drawPath(路径)、drawText(文本)、drawOval(椭圆)、
+drawBitmap(贴图)等等。
+
+Paint画笔也是绘图中一个非常重要的元素。
+
+    * setAntiAlias() 　　　//设置画笔的锯齿效果
+    * setColor() 　　　　//设置画笔的颜色
+    * setARGB() 　　　　　//设置画笔的A、R、G、B值
+    * setAlpha() 　　　　//设置画笔的Alpha值
+    * setTextSize() 　　　//设置字体的尺寸
+    * setStyle() 　　　　//设置画笔的风格(空心或者实心)
+    * setStrokeWidth() 　//设置空心边框的宽度
+
+Canvas家族成员
+
+* DrawPoint，绘制点
+
+```java
+canvas.drawPoint(x,y,paint);
+//绘制多个点
+canvas.drawPoints(pts,paint);
+```
+
+* DrawLine，绘制直线
+```java
+canvas.drawLine(startX,startY,endX,endY,paint);
+```
+* DrawLines，绘制多条直线
+```java
+float[] pts = {startX1,startX2,endX1,endX2,...,startXn,startYn,endXn,endYn};
+canvas.drawLines(pts,point);
+```
+* DrawRect,绘制矩形
+```java
+canvas.drawRect(left,top,right,bottom,paint);
+```
+* DrawRoundRect,绘制圆角矩形
+```java
+canvas.drawRoundRect(left,top,right,bottom,radiusX,radiusY,paint);
+```
+* DrawCircle,绘制圆
+```java
+canvas.drawCircle(circleX,circleY,radius,paint);
+```
+* DrawArc,绘制弧形、扇形
+```java
+paint.setStyle(Paint.STROKE);
+canvas.drawArc(left,top,right,bottom,startAngle,sweepAngle,(boolean类型)useCenter,paint);
+//Panit.Style和useCenter属性的组合
+//1.绘制扇形
+Panit.Style.STROKE + useCenter(true);
+
+//2.绘制弧形
+Panit.Style.STROKE + useCenter(false);
+
+//3.绘制实心扇形
+Panit.Style.FILL + useCenter(true);
+
+//4.绘制实心弧形
+Panit.Style.FILL + useCenter(false);
+```
+* DrawOval，绘制椭圆
+```java
+//通过椭圆的外接矩形来绘制椭圆
+canvas.drawOval(left,top,right,bottom,paint);
+```
+* DrawText，绘制文本
+```java
+canvas.drawText(text,startX,startY,paint);
+```
+* DrawPosText,在指定位置绘制文本
+```java
+canvas.drawPosText(text,new float[]{x1,x2,x2,y2,...xn,yn},paint);
+```
+* DrawPath,绘制路径
+```java
+Path path = new Path();
+path.moveTo(50,50);
+path.lineTo(100,100);
+path.lineTo(100,300);
+path.lineTo(300,50);
+canvas.drawPath(path,paint);
+```
+## Android XML绘图
+
+### Bitmap
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<bitmap xmlns:android="http://schema.android.com/apk/res/android
+    android:src="@drawable/ic_lancher" />
+```
+
+### Shape
+
+Shape可以说是XML绘图的精华所在。Shape功能十分强大,无论是扁平化、拟物化还是渐变,它都能绘制。
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schema.android.com/apk/res/android
+    //默认为rectangle
+    android:shape=["rectangle"|"oval"|"line"|"ring"] >
+    <corners 　//当shape="rectangle"时使用
+        android:radius="1dp"
+        android:topLeftRadius="0.5dp"
+        android:topRightRadius="0.5dp"
+        android:bottomLeftRadius="0.5dp"
+        android:bottomRightRadius="0.5dp" />
+
+    <gradient  //渐变
+        android:angle="0.5dp"
+        android:centerX="0.5dp"
+        android:centerY="0.5dp"
+        android:centerColor="#ffffff"
+        android:endColor="@color/"
+        android:gradientRadius="0.5dp"
+        android:startColor="@color/"
+        android:type=["linear"|"radial"|"sweep"]
+        android:useLevel=["true" | "false"] />
+
+    <padding
+        android:left="20dp"
+        android:top="20dp"
+        android:right="20dp"
+        android:bottom="20dp" />
+
+    <size  //指定大小，一般用imageview配合scaleType属性使用
+        android:width="20dp"
+        android:height="20dp" />
+
+    <solid  //填充颜色
+        android:color="@color/" />
+
+    <stroke //指定边框
+        android:width="20dp"
+        android:color="@color/"
+        //虚线宽度
+        android:dashWidth="5dp"
+        //虚线间隔宽度
+        android:dashGap="2dp"
+
+</shape>
+```
+
+### layer
+
+通过layer、layer-list实现图层效果,图片会依次叠加
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schema.android.com/apk/res/android >
+
+<!--图片1-->
+<item
+    android:drawable="@drawable/ic_launcher" />
+
+<!--图片2-->
+<item
+    android:drawable="@drawable/ic_launcher"
+    android:left="10dp"
+    android:top="10dp"
+    android:right="10dp"
+    android:bottom="10dp" />
+
+</layer-list>
+```
+
+### Selector
+
+Selector的作用在于实现静态绘图中的事件反馈,通过给不同的事件设置不同的图像,从而在程序中根据用户输入,返回不同的效果。
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schema.android.com/apk/res/android >
+
+<!--默认时的背景图片-->
+<item android:drawable="@drawable/X1" />
+
+<!--没有焦点时的背景图片-->
+<item android:state_window_focused="false"
+      android:drawable="@drawable/X2 />
+
+<!--非触摸模式下获得焦点并单击时的背景图片-->
+<item android:state_focused="true"
+      android:state_pressed="true"
+      android:drawable="@drawable/X3" />
+
+<!--触摸模式下获得焦点并单击时的背景图片-->
+<item android:state_focused="false"
+      android:state_pressed="true"
+      android:drawable="@drawable/X4" />
+
+<!--选中时的背景图片-->
+<item android:state_selected="true"
+      android:drawable="@drawable/X5" />
+
+<!--获得焦点时的图片背景-->
+<item android:state_focused="true"
+      android:drawable="@drawable/X6 />
+
+</selector>
+```
+Selector也可以使用Shape作为它的Item，实现具有点击反馈效果的Selector
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schema.android.com/apk/res/android >
+
+<item android:state_pressed="true" >
+    <shape android:shape="rectangle" >
+
+<!--填充的颜色-->
+<solid android:color="#00ff00" />
+
+<!--设置按钮的四个角为弧形-->
+<corners android:radius="5dp" />
+
+<padding
+    android:bottom="10dp"
+    android:left="10dp"
+    android:right="10dp"
+    android:top="10dp" />
+
+    </shape>
+</item>
+
+<item >
+    <shape android:shape="rectangle" >
+
+<!--填充的颜色-->
+<solid android:color="#00ffff" />
+
+<!--设置按钮的四个角为弧形-->
+<corners android:radius="5dp" />
+
+<padding
+    android:bottom="10dp"
+    android:left="10dp"
+    android:right="10dp"
+    android:top="10dp" />
+
+    </shape>
+</item>
+
+</selector>
+```
+## Android绘图技巧
+
+### Canvas
+
+* Canvas.save()
+
+Canvas.save()这个方法,从字面上可以理解为保存画布。它的作用就是将之前的所有已绘制图像保存起来,让后续的操作就好像在一个新的图层
+上操作一样。
+
+* Canvas.restore()
+
+Canvas.restore()这个方法,可以理解为合并图层操作。它的作用是将我们在sava()之后绘制的所有图像与sava()之前的图像进行合并。
+
+* Canvas.translate()
+
+Canvas.translate()这个方法,可以理解为坐标系的平移。默认绘制坐标零点位于屏幕左上角,那么在调用translate(x,y)方法之后,
+则将原点(0,0)移动到了(x,y)。之后的所有绘图操作都将以(x,y)为原点执行。
+
+* Canvas.rotate()
+
+Canvas.rotate()将坐标系旋转了一定的角度。
+
+下面的例子绘制一个仪表盘。
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class MyView extends View {
+
+    //大圆
+    private Paint circlePaint;
+    //刻度线和刻度值
+    private Paint degreePaint;
+    //圆心的点
+    private Paint pointPaint;
+    //指针,小时的指针
+    private Paint hourPaint;
+    //指针,分钟的指针
+    private Paint minutePaint;
+    private int width, height;
+
+    public MyView(Context context) {
+        this(context, null);
+    }
+
+    public MyView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public MyView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+
+        pointPaint = new Paint();
+        pointPaint.setAntiAlias(true);
+        pointPaint.setStrokeWidth(15);
+        pointPaint.setColor(getResources().getColor(R.color.colorAccent));
+
+        circlePaint = new Paint();
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setStrokeWidth(5);
+        circlePaint.setColor(getResources().getColor(R.color.colorAccent));
+
+        degreePaint = new Paint();
+        degreePaint.setColor(getResources().getColor(R.color.colorAccent));
+        degreePaint.setStrokeWidth(3);
+        degreePaint.setAntiAlias(true);
+
+        hourPaint = new Paint();
+        hourPaint.setStrokeWidth(20);
+        hourPaint.setAntiAlias(true);
+        hourPaint.setColor(getResources().getColor(R.color.colorAccent));
+
+        minutePaint = new Paint();
+        minutePaint.setStrokeWidth(10);
+        minutePaint.setAntiAlias(true);
+        minutePaint.setColor(getResources().getColor(R.color.colorAccent));
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        width = getMeasuredWidth();
+        height = getMeasuredHeight();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawCircle(width / 2, height / 2, width / 2, circlePaint);
+        canvas.drawPoint(width / 2, height / 2, pointPaint);
+        for (int i = 0; i < 24; i++) {
+            if (i == 0 || i == 6 || i == 12 || i == 18) {
+                degreePaint.setStrokeWidth(5);
+                degreePaint.setTextSize(30);
+                canvas.drawLine(width / 2, height / 2 - width / 2,
+                        width / 2, height / 2 - width / 2 + 60, degreePaint);
+                String degree = String.valueOf(i);
+                canvas.drawText(degree,
+                        width / 2 - degreePaint.measureText(degree) / 2, height / 2 - width / 2 + 90, degreePaint);
+            } else {
+                degreePaint.setStrokeWidth(3);
+                degreePaint.setTextSize(15);
+                canvas.drawLine(width / 2, height / 2 - width / 2,
+                        width / 2, height / 2 - width / 2 + 30, degreePaint);
+                String degree = String.valueOf(i);
+                canvas.drawText(degree,
+                        width / 2 - degreePaint.measureText(degree) / 2, height / 2 - width / 2 + 60, degreePaint);
+            }
+            canvas.rotate(15, width / 2, height / 2);
+        }
+
+        canvas.save();
+        canvas.translate(width / 2, height / 2);
+        canvas.drawLine(0, 0, 100, 100, hourPaint);
+        canvas.drawLine(0, 0, 100, 200, minutePaint);
+        canvas.restore();
+    }
+}
+```
+效果如下图：
+![仪表盘](http://7xljei.com1.z0.glb.clouddn.com/4379274283332372.jpg)
