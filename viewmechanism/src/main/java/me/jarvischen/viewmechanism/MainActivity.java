@@ -12,8 +12,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    public void basicView(View view){
-        Intent intent = new Intent(MainActivity.this,BasicViewActivity.class);
+
+    public void basicView(View view) {
+        Intent intent = new Intent(MainActivity.this, BasicViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void primaryColor(View view) {
+        Intent intent = new Intent(MainActivity.this, PrimaryColorActivity.class);
+        startActivity(intent);
+    }
+
+    public void colorMatrix(View view) {
+        Intent intent = new Intent(MainActivity.this, ColorMatrixActivity.class);
         startActivity(intent);
     }
 }

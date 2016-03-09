@@ -958,13 +958,13 @@ drawBitmap(贴图)等等。
 
 Paint画笔也是绘图中一个非常重要的元素。
 
-    * setAntiAlias() 　　　//设置画笔的锯齿效果
-    * setColor() 　　　　//设置画笔的颜色
-    * setARGB() 　　　　　//设置画笔的A、R、G、B值
-    * setAlpha() 　　　　//设置画笔的Alpha值
-    * setTextSize() 　　　//设置字体的尺寸
-    * setStyle() 　　　　//设置画笔的风格(空心或者实心)
-    * setStrokeWidth() 　//设置空心边框的宽度
+* setAntiAlias() 　　　//设置画笔的锯齿效果
+* setColor() 　　　　//设置画笔的颜色
+* setARGB() 　　　　　//设置画笔的A、R、G、B值
+* setAlpha() 　　　　//设置画笔的Alpha值
+* setTextSize() 　　　//设置字体的尺寸
+* setStyle() 　　　　//设置画笔的风格(空心或者实心)
+* setStrokeWidth() 　//设置空心边框的宽度
 
 Canvas家族成员
 
@@ -1330,3 +1330,457 @@ public class MyView extends View {
 ```
 效果如下图：
 ![仪表盘](http://7xljei.com1.z0.glb.clouddn.com/4379274283332372.jpg)
+
+[Android Canvas编程：对rotate()和translate()两个方法的研究](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2013/0304/957.html)
+
+### Layer图层
+
+Android通过调用saveLayer()、saveLayerAlpha()方法将一个图层入栈(图层基于栈管理结构),
+使用restore()、restoreToCount()方法将一个图层出栈。入栈的时候,后面所有的操作都发生在这个图层上,
+而出栈的时候,则会把图像绘制到上层Canvas上。
+
+如下的代码：
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class BasicView extends View {
+
+    private Paint paint;
+
+    private static final int LAYER_FLAGS =
+            Canvas.MATRIX_SAVE_FLAG |
+                    Canvas.CLIP_SAVE_FLAG |
+                    Canvas.HAS_ALPHA_LAYER_SAVE_FLAG |
+                    Canvas.FULL_COLOR_LAYER_SAVE_FLAG |
+                    Canvas.CLIP_TO_LAYER_SAVE_FLAG;
+
+    public BasicView(Context context) {
+        this(context, null);
+    }
+
+    public BasicView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public BasicView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(2);
+
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawColor(Color.WHITE);
+        paint.setColor(getResources().getColor(R.color.colorAccent));
+        canvas.drawCircle(150, 150, 100, paint);
+
+        //127,255,0
+        canvas.saveLayerAlpha(0, 0, 400, 400, 0, LAYER_FLAGS);
+        paint.setColor(getResources().getColor(R.color.colorPrimary));
+        canvas.drawCircle(200, 200, 100, paint);
+        canvas.restore();
+    }
+}
+```
+
+透明为127的时候,半透明:
+
+![半透明](http://7xljei.com1.z0.glb.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20160309152958.png)
+
+透明为255的时候,完全不透明:
+
+![完全不透明](http://7xljei.com1.z0.glb.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20160309153018.png)
+
+透明为0的时候,完全透明:
+
+![完全透明](http://7xljei.com1.z0.glb.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20160309153027.png)
+
+## Android图像处理之色彩特效处理
+
+### 色彩矩阵
+
+图像的色调、饱和度、亮度这三个属性在图像处理中使用非常之多,Android封装了一个ColorMatrix类（颜色矩阵）,
+通过改变矩阵值来处理这些属性。
+
+
+* 色调：//第一个参数分别为red、green、blue 第二个参数为要处理的值。
+
+```java
+ColorMatrix hueMatrix=new ColorMatrix();
+      hueMatrix.setRotate(0, hue);
+      hueMatrix.setRotate(1, hue);
+      hueMatrix.setRotate(2, hue);
+```
+
+* 饱和度：//参数即为饱和度，当饱和度为0时图像就变成灰图像了。
+
+```java
+ColorMatrix saturationMatrix=new ColorMatrix();
+      saturationMatrix.setSaturation(saturation);
+```
+
+* 亮度：//当三原色以相同比例进行混合的时候，就会显示出白色，从而调节亮度。
+
+```java
+ColorMatrix lumMatrix=new ColorMatrix();
+      lumMatrix.setScale(lum, lum, lum, 1);
+```
+
+* 让三种效果叠加：ColorMatrix imageMatrix=new ColorMatrix();
+
+```java
+imageMatrix.postConcat(hueMatrix);
+imageMatrix.postConcat(saturationMatrix);
+imageMatrix.postConcat(lumMatrix);
+```
+
+下面是个具体的案例。
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageview"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="24dp" />
+
+    <SeekBar
+        android:id="@+id/seekbarHue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageview" />
+
+    <SeekBar
+        android:id="@+id/seekbarSaturation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekbarHue" />
+
+    <SeekBar
+        android:id="@+id/seekbatLum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekbarSaturation" />
+
+</RelativeLayout>
+```
+
+Bitmap处理类：
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class ImageHelper {
+    public static Bitmap handleImageEffect(Bitmap bm, float hue, float saturation, float lum) {
+        Bitmap bmp = Bitmap.createBitmap(
+                bm.getWidth(), bm.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+
+        ColorMatrix hueMatrix = new ColorMatrix();
+        hueMatrix.setRotate(0, hue);
+        hueMatrix.setRotate(1, hue);
+        hueMatrix.setRotate(2, hue);
+
+        ColorMatrix saturationMatrix = new ColorMatrix();
+        saturationMatrix.setSaturation(saturation);
+
+        ColorMatrix lumMatrix = new ColorMatrix();
+        lumMatrix.setScale(lum, lum, lum, 1);
+
+        ColorMatrix imageMatrix = new ColorMatrix();
+        imageMatrix.postConcat(hueMatrix);
+        imageMatrix.postConcat(saturationMatrix);
+        imageMatrix.postConcat(lumMatrix);
+
+        paint.setColorFilter(new ColorMatrixColorFilter(imageMatrix));
+        canvas.drawBitmap(bm, 0, 0, paint);
+        return bmp;
+    }
+}
+```
+
+逻辑：
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+
+public class PrimaryColorActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener{
+
+    private static int MAX_VALUE = 255;
+    private static int MID_VALUE = 127;
+    private ImageView mImageView;
+    //分别为色调,饱和度,亮度
+    private SeekBar mSeekbarhue, mSeekbarSaturation, mSeekbarLum;
+    //分别为色调,饱和度,亮度
+    private float mHue, mStauration, mLum;
+    private Bitmap bitmap;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_primary_color);
+        bitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.icon);
+        mImageView = (ImageView) findViewById(R.id.imageview);
+        mSeekbarhue = (SeekBar) findViewById(R.id.seekbarHue);
+        mSeekbarSaturation = (SeekBar) findViewById(R.id.seekbarSaturation);
+        mSeekbarLum = (SeekBar) findViewById(R.id.seekbatLum);
+        mSeekbarhue.setOnSeekBarChangeListener(this);
+        mSeekbarSaturation.setOnSeekBarChangeListener(this);
+        mSeekbarLum.setOnSeekBarChangeListener(this);
+        mSeekbarhue.setMax(MAX_VALUE);
+        mSeekbarSaturation.setMax(MAX_VALUE);
+        mSeekbarLum.setMax(MAX_VALUE);
+        mSeekbarhue.setProgress(MID_VALUE);
+        mSeekbarSaturation.setProgress(MID_VALUE);
+        mSeekbarLum.setProgress(MID_VALUE);
+        mImageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch (seekBar.getId()) {
+            case R.id.seekbarHue:
+                mHue = (progress - MID_VALUE) * 1.0F / MID_VALUE * 180;
+                break;
+            case R.id.seekbarSaturation:
+                mStauration = progress * 1.0F / MID_VALUE;
+                break;
+            case R.id.seekbatLum:
+                mLum = progress * 1.0F / MID_VALUE;
+                break;
+        }
+        mImageView.setImageBitmap(ImageHelper.handleImageEffect(
+                bitmap, mHue, mStauration, mLum));
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+}
+```
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/119382253878632655.jpg)
+
+### Android颜色矩阵-ColorMatrix
+
+代码如下：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:src="@drawable/icon"
+        android:layout_weight="2" />
+
+    <GridLayout
+        android:id="@+id/group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:columnCount="5"
+        android:rowCount="4">
+
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="btnChange"
+            android:text="Change" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="btnReset"
+            android:text="Reset" />
+    </LinearLayout>
+
+</LinearLayout>
+```
+
+逻辑：
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+
+public class ColorMatrixActivity extends AppCompatActivity {
+
+    private ImageView mImageView;
+    private GridLayout mGroup;
+    private Bitmap bitmap;
+    private int mEtWidth, mEtHeight;
+    //4*5的矩阵
+    private EditText[] mEts = new EditText[20];
+    private float[] mColorMatrix = new float[20];
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_color_matrix);
+        bitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.icon);
+        mImageView = (ImageView) findViewById(R.id.imageview);
+        mGroup = (GridLayout) findViewById(R.id.group);
+        mImageView.setImageBitmap(bitmap);
+
+        mGroup.post(new Runnable() {
+            @Override
+            public void run() {
+                // 获取宽高信息
+                mEtWidth = mGroup.getWidth() / 5;
+                mEtHeight = mGroup.getHeight() / 4;
+                addEts();
+                initMatrix();
+            }
+        });
+    }
+
+    // 获取矩阵值
+    private void getMatrix() {
+        for (int i = 0; i < 20; i++) {
+            mColorMatrix[i] = Float.valueOf(
+                    mEts[i].getText().toString());
+        }
+    }
+
+    // 将矩阵值设置到图像
+    private void setImageMatrix() {
+        Bitmap bmp = Bitmap.createBitmap(
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        android.graphics.ColorMatrix colorMatrix =
+                new android.graphics.ColorMatrix();
+        colorMatrix.set(mColorMatrix);
+
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+        mImageView.setImageBitmap(bmp);
+    }
+
+    // 作用矩阵效果
+    public void btnChange(View view) {
+        getMatrix();
+        setImageMatrix();
+    }
+
+    // 重置矩阵效果
+    public void btnReset(View view) {
+        initMatrix();
+        getMatrix();
+        setImageMatrix();
+    }
+
+    // 添加EditText
+    private void addEts() {
+        for (int i = 0; i < 20; i++) {
+            EditText editText = new EditText(ColorMatrixActivity.this);
+            mEts[i] = editText;
+            mGroup.addView(editText, mEtWidth, mEtHeight);
+        }
+    }
+
+    // 初始化颜色矩阵为初始状态
+    private void initMatrix() {
+        for (int i = 0; i < 20; i++) {
+            if (i % 6 == 0) {
+                mEts[i].setText(String.valueOf(1));
+            } else {
+                mEts[i].setText(String.valueOf(0));
+            }
+        }
+    }
+}
+```
+这里需要注意的是在Activity的onCreate方法中,无法获取到GridLayout的宽高,所以通过View的post方法,在视图创建完毕后获得其宽高值。
+
+![高饱和度](http://7xljei.com1.z0.glb.clouddn.com/868361883326946341.jpg)
+
+![去色效果](http://7xljei.com1.z0.glb.clouddn.com/82765487251827052.jpg)
+
+![怀旧效果](http://7xljei.com1.z0.glb.clouddn.com/385029250006128362.jpg)
+
+![图像反转](http://7xljei.com1.z0.glb.clouddn.com/651940980052885974.jpg)
+
+![灰度效果](http://7xljei.com1.z0.glb.clouddn.com/901854896512497535.jpg)
+
+
+

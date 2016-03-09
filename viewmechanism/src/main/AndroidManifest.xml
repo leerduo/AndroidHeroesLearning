@@ -15,7 +15,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BasicViewActivity"></activity>
+        <activity android:name=".BasicViewActivity" />
+        <activity android:name=".PrimaryColorActivity" />
+        <activity android:name=".ColorMatrixActivity"></activity>
     </application>
 
 </manifest>

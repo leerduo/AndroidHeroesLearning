@@ -7,14 +7,32 @@
 
     <me.jarvischen.viewmechanism.MyView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
+
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/selectortest"
+        android:onClick="colorMatrix"
+        android:text="跳转到ColorMatrix" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/btnBasicView"
+        android:background="@drawable/selectortest"
+        android:onClick="primaryColor"
+        android:text="跳转到PrimaryColor" />
+
+    <Button
+        android:id="@+id/btnBasicView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@drawable/selectortest"
-        android:text="跳转到2D绘图基础"
         android:onClick="basicView"
-        />
+        android:text="跳转到Layer图层" />
 </RelativeLayout>
