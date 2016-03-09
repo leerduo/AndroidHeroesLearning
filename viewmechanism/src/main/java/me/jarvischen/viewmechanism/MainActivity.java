@@ -27,4 +27,14 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ColorMatrixActivity.class);
         startActivity(intent);
     }
+
+    public void pixelsEffect(View view) {
+        Intent intent = new Intent(MainActivity.this, PixelsEffectActivity.class);
+        startActivity(intent);
+    }
+
+    public void imageMatrix(View view) {
+        Intent intent = new Intent(MainActivity.this, ImageMatrixActivity.class);
+        startActivity(intent);
+    }
 }

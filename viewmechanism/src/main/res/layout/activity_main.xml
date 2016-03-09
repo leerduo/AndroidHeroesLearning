@@ -10,12 +10,30 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/btn_colormatrix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@drawable/selectortest"
         android:onClick="colorMatrix"
         android:text="跳转到ColorMatrix" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/selectortest"
+        android:onClick="pixelsEffect"
+        android:text="跳转到PixelsEffect" />
+
+    <Button
+        android:layout_below="@+id/btn_colormatrix"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        android:onClick="imageMatrix"
+        android:text="跳转到ImageMatrix" />
 
     <Button
         android:layout_width="wrap_content"
