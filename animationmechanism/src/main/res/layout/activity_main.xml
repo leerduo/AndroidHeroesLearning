@@ -29,4 +29,29 @@
         android:onClick="propertyAnimateAdvance"
         android:background="@drawable/selectortest"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="PropertyValuesHolder"
+        android:onClick="PropertyValuesHolder"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="自定义动画"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnAnim"
+        android:background="@drawable/selectortest"
+        />
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/imageView"
+        android:onClick="imgClose"
+        android:padding="4dp"
+        android:background="@drawable/icon"
+        android:layout_gravity="center_horizontal"
+        />
 </LinearLayout>

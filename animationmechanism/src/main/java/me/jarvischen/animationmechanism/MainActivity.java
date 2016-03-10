@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation;
+import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation2;
 import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyAnimationAdvanceActivity;
+import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyValuesHolderActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,5 +33,21 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    public void PropertyValuesHolder(View view) {
+        Intent intent = new Intent(MainActivity.this, PropertyValuesHolderActivity.class);
+        startActivity(intent);
+    }
+
+    public void imgClose(View view){
+        CustomAnimation ca = new CustomAnimation();
+        view.startAnimation(ca);
+    }
+
+    public void btnAnim(View view) {
+        CustomAnimation2 customAnim = new CustomAnimation2();
+        customAnim.setmRotateY(30);
+        view.startAnimation(customAnim);
+    }
 
 }

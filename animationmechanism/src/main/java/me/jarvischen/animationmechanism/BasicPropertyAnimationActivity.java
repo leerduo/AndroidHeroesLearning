@@ -10,18 +10,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 public class BasicPropertyAnimationActivity extends AppCompatActivity {
 
     private static final String TAG = "BasicProperty";
     private ImageView iv;
 
+    private LinearLayout ll;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_property_animation);
         iv = (ImageView) findViewById(R.id.iv);
+        ll = (LinearLayout) findViewById(R.id.ll);
+        AlphaAnimation aa = new AlphaAnimation(0f,1f);
+        aa.setDuration(3000);
+        LayoutAnimationController lac = new LayoutAnimationController(aa,0.5f);
+        lac.setOrder(LayoutAnimationController.ORDER_NORMAL);
+        ll.setLayoutAnimation(lac);
         //从xml加载动画
         final Animator animator = AnimatorInflater.loadAnimator(this, R.animator.animatorset_set);
         animator.setTarget(iv);

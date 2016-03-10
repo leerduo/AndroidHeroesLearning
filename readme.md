@@ -3726,3 +3726,88 @@ textview.animate().x(500).y(500).setDuration(5000)
     .setInterpolator(new BounceInterpolator());
 ```
 
+## 布局动画
+布局动画是作用在ViewGroup上的,给ViewGroup添加view时添加动画过渡效果。
+* 简易方式（但是没有什么效果）：在xml中添加如下属性 android:animateLayoutChanges="true
+* 通过LayoutAnimationController来自定义子view的过渡效果，下面是一个常见的使用例子：
+
+```java
+ LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ll);
+ ScaleAnimation scaleAnimation = new ScaleAnimation(0,1,0,1);
+ scaleAnimation.setDuration(2000);
+ LayoutAnimationController controller = new LayoutAnimationController(scaleAnimation, 0.5f);
+ controller.setOrder(LayoutAnimationController.ORDER_NORMAL);//NORMAL 顺序 RANDOM 随机 REVERSE 反序
+ linearLayout.setLayoutAnimation(controller);
+```
+
+# 自定义动画
+
+创建自定义动画就是要实现它的`applyTransformation`的逻辑，不过通常还需要覆盖父类的initialize方法来实现初始化工作。
+下面是一个模拟电视机关闭的动画，
+```java
+public class CustomTV extends Animation {
+
+    private int mCenterWidth;
+    private int mCenterHeight;
+
+    @Override
+    public void initialize(int width, int height, int parentWidth, int parentHeight) {
+        super.initialize(width, height, parentWidth, parentHeight);
+        setDuration(1000);// 设置默认时长
+        setFillAfter(true);// 动画结束后保留状态
+        setInterpolator(new AccelerateInterpolator());// 设置默认插值器
+        mCenterWidth = width / 2;
+        mCenterHeight = height / 2;
+    }
+
+    @Override
+    protected void applyTransformation(float interpolatedTime, Transformation t) {
+        final Matrix matrix = t.getMatrix();
+        matrix.preScale(1, 1 - interpolatedTime, mCenterWidth, mCenterHeight);
+    }
+}
+```
+applyTransformation方法的第一个参数interpolatedTime是插值器的时间因子,取值在0到1之间;
+第二个参数Transformation是矩阵的封装类,一般使用它来获得当前的矩阵Matrix对,然后对矩阵进行操作,就可以实现动画效果了。
+
+如何实现3D动画效果呢？
+使用android.graphics.Camera中的Camera类,它封装了OpenGL的3D动画。可以把Camera想象成一个真实的摄像机,
+当物体固定在某处时,只要移动摄像机就能拍摄到具有立体感的图像,因此通过它可以实现各种3D效果。
+下面是一个3D动画效果的例子
+```java
+public class CustomAnim extends Animation {
+
+    private int mCenterWidth;
+    private int mCenterHeight;
+    private Camera mCamera = new Camera();
+    private float mRotateY = 0.0f;
+
+    @Override
+    public void initialize(int width, int height, int parentWidth, int parentHeight) {
+        super.initialize(width, height, parentWidth, parentHeight);
+        setDuration(2000);// 设置默认时长
+        setFillAfter(true);// 动画结束后保留状态
+        setInterpolator(new BounceInterpolator());// 设置默认插值器
+        mCenterWidth = width / 2;
+        mCenterHeight = height / 2;
+    }
+
+    // 暴露接口-设置旋转角度
+    public void setRotateY(float rotateY) {
+        mRotateY = rotateY;
+    }
+
+    @Override
+    protected void applyTransformation( float interpolatedTime, Transformation t) {
+        final Matrix matrix = t.getMatrix();
+        mCamera.save();
+        mCamera.rotateY(mRotateY * interpolatedTime);// 使用Camera设置旋转的角度
+        mCamera.getMatrix(matrix);// 将旋转变换作用到matrix上
+        mCamera.restore();
+        // 通过pre方法设置矩阵作用前的偏移量来改变旋转中心
+        matrix.preTranslate(mCenterWidth, mCenterHeight);
+        matrix.postTranslate(-mCenterWidth, -mCenterHeight);
+    }
+}
+```
+
