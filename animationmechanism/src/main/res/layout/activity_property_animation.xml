@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context=".BasicPropertyAnimationActivity">
+
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/icon"
+        />
+
+    <Button
+        android:text="ValueAnimator用法"
+        android:onClick="valueAnimator1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="ObjectAnimator_Alpha"
+        android:onClick="objectAnimator1Alpha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="ObjectAnimator_Rotation"
+        android:onClick="objectAnimator1Rotation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="ObjectAnimator_translationX"
+        android:onClick="objectAnimator1translationX"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="ObjectAnimator_scaleY"
+        android:onClick="objectAnimator1scaleY"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+    <Button
+        android:text="ObjectAnimator_set"
+        android:onClick="objectAnimator1set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectortest"
+        />
+
+</LinearLayout>

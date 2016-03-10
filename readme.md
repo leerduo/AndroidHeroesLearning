@@ -3173,3 +3173,556 @@ public class SimpleDrawWithSurfaceView  extends SurfaceView implements SurfaceHo
 
 ![效果图](http://7xljei.com1.z0.glb.clouddn.com/223678467572715827.jpg)
 
+# Android动画机制与使用技巧
+
+## View动画
+
+包括帧动画和补间动画。
+
+View动画的缺陷在于他的不可交互性。当某个元素发生View动画后,其响应事件的位置还依然在动画前的地方。其次View动画只能作用在View动画中。
+
+```java
+package me.jarvischen.animationmechanism;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
+
+public class ViewAnimationActivity extends AppCompatActivity {
+
+    private ImageView iv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_view_animation);
+        iv = (ImageView) findViewById(R.id.iv);
+    }
+
+    public void btnAlpha(View view) {
+        AlphaAnimation aa = new AlphaAnimation(0, 1);
+        aa.setDuration(3000);
+        iv.startAnimation(aa);
+    }
+
+    public void btnRotate(View view) {
+        //方案1
+       /* RotateAnimation ra = new RotateAnimation(0,360,100,100);
+        ra.setDuration(3000);
+        iv.startAnimation(ra);*/
+
+        //方案2
+        RotateAnimation ra = new RotateAnimation(0, 360,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+        ra.setDuration(3000);
+        iv.startAnimation(ra);
+    }
+
+    public void btnTranslate(View view) {
+        TranslateAnimation ta = new TranslateAnimation(0, 200, 0, 300);
+        ta.setDuration(3000);
+        iv.startAnimation(ta);
+    }
+
+    public void btnScale(View view) {
+        //方案1
+        /*ScaleAnimation sa = new ScaleAnimation(0,2,0,2);
+        sa.setDuration(3000);
+        iv.startAnimation(sa);*/
+        //方案2
+        ScaleAnimation sa = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        sa.setDuration(3000);
+        iv.startAnimation(sa);
+    }
+
+    public void btnSet(View view){
+        AnimationSet as = new AnimationSet(true);
+        as.setDuration(1500);
+
+        AlphaAnimation aa = new AlphaAnimation(0, 1);
+        aa.setDuration(1500);
+        as.addAnimation(aa);
+
+        TranslateAnimation ta = new TranslateAnimation(0, 100, 0, 200);
+        ta.setDuration(1500);
+        as.addAnimation(ta);
+
+        iv.startAnimation(as);
+    }
+}
+```
+
+## 属性动画
+
+属性动画参考这几篇文章。
+[Android属性动画完全解析(上),初识属性动画的基本用法](http://blog.csdn.net/guolin_blog/article/details/43536355)
+
+其中实现的代码为：
+
+```java
+package me.jarvischen.animationmechanism;
+
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+
+public class BasicPropertyAnimationActivity extends AppCompatActivity {
+
+    private static final String TAG = "BasicProperty";
+    private ImageView iv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_property_animation);
+        iv = (ImageView) findViewById(R.id.iv);
+        //从xml加载动画
+        final Animator animator = AnimatorInflater.loadAnimator(this, R.animator.animatorset_set);
+        animator.setTarget(iv);
+        animator.setDuration(3000);
+        animator.start();
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                animator.start();
+            }
+        });
+    }
+
+    public void valueAnimator1(View view) {
+        final ValueAnimator valueAnimator = ValueAnimator.ofFloat(55, 233);
+        valueAnimator.setDuration(3000);
+        valueAnimator.start();
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float animatedValue = (float) valueAnimator.getAnimatedValue();
+                Log.e(TAG, "onAnimationUpdate=" + animatedValue);
+            }
+        });
+    }
+
+    public void objectAnimator1Alpha(View view) {
+        //透明度
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(iv, "alpha", 1f, 0f, 1f);
+        objectAnimator.setDuration(1500);
+        objectAnimator.setRepeatCount(100);
+        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        objectAnimator.start();
+
+
+        //添加Animator监听器(接口的四个方法全部实现了)
+        objectAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
+
+    public void objectAnimator1Rotation(View view) {
+        //旋转
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(iv, "rotation", 0f, 360f);
+        objectAnimator.setDuration(1500);
+        objectAnimator.setRepeatCount(100);
+        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        objectAnimator.start();
+
+        //添加Animator监听器(AnimatorListenerAdapter这种方式只需要选择自己需要的方法即可,不需要四个全部实现)
+        objectAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+            }
+        });
+    }
+
+    public void objectAnimator1translationX(View view) {
+        //平移
+        float translationX = iv.getTranslationX();
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(iv, "translationX", translationX, -500f, translationX);
+        objectAnimator.setDuration(1500);
+        objectAnimator.setRepeatCount(100);
+        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        objectAnimator.start();
+    }
+
+    public void objectAnimator1scaleY(View view) {
+        //缩放
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(iv, "scaleY", 1f, 1 / 2f, 1f);
+        objectAnimator.setDuration(1500);
+        objectAnimator.setRepeatCount(100);
+        objectAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        objectAnimator.start();
+    }
+
+    public void objectAnimator1set(View view) {
+        ObjectAnimator moveIn = ObjectAnimator.ofFloat(iv, "translationX", -500f, 0f);
+        ObjectAnimator rotate = ObjectAnimator.ofFloat(iv, "rotation", 0f, 360f);
+        ObjectAnimator fadeInOut = ObjectAnimator.ofFloat(iv, "alpha", 1f, 0f, 1f);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(rotate).with(fadeInOut).after(moveIn);
+        animatorSet.setDuration(2000);
+        animatorSet.start();
+    }
+
+}
+```
+
+使用AnimatorInflater的loadAnimator方法加载xml动画的文件如下：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="sequentially">
+
+    <objectAnimator
+        android:duration="2000"
+        android:propertyName="translationX"
+        android:valueFrom="-500"
+        android:valueTo="0"
+        android:valueType="floatType"></objectAnimator>
+
+    <set android:ordering="together">
+        <objectAnimator
+            android:duration="3000"
+            android:propertyName="rotation"
+            android:valueFrom="0"
+            android:valueTo="360"
+            android:valueType="floatType"></objectAnimator>
+
+        <set android:ordering="sequentially">
+            <objectAnimator
+                android:duration="1500"
+                android:propertyName="alpha"
+                android:valueFrom="1"
+                android:valueTo="0"
+                android:valueType="floatType"></objectAnimator>
+            <objectAnimator
+                android:duration="1500"
+                android:propertyName="alpha"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType"></objectAnimator>
+        </set>
+    </set>
+
+</set>
+```
+
+[Android属性动画完全解析(中),ValueAnimator和ObjectAnimator的高级用法](http://blog.csdn.net/guolin_blog/article/details/43816093)
+
+这部分是核心,其中代码如下：
+实体类Point.java：
+```java
+package me.jarvischen.animationmechanism.advancepropertyanimation;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class Point {
+    private float x;
+    private float y;
+
+    public Point(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+}
+```
+两个实现TypeEvaluator接口的Evaluator,PointEvaluator.java:
+
+```java
+package me.jarvischen.animationmechanism.advancepropertyanimation;
+
+import android.animation.TypeEvaluator;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class PointEvaluator implements TypeEvaluator {
+    @Override
+    public Object evaluate(float fraction, Object startValue, Object endValue) {
+        Point startPoint = (Point) startValue;
+        Point endPoint = (Point) endValue;
+        float x = startPoint.getX() + fraction * (endPoint.getX() - startPoint.getX());
+        float y = startPoint.getY() + fraction * (endPoint.getY() - startPoint.getY());
+        Point point = new Point(x,y);
+        return point;
+    }
+}
+```
+
+这个比较好理解。
+
+ColorEvaluator.java,这个里面的evaluate方法不是很好理解,参考ArgbEvaluator这个类中的evaluate方法。
+
+```java
+package me.jarvischen.animationmechanism.advancepropertyanimation;
+
+import android.animation.TypeEvaluator;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class ColorEvaluator implements TypeEvaluator {
+    private int mCurrentRed = -1;
+
+    private int mCurrentGreen = -1;
+
+    private int mCurrentBlue = -1;
+
+    @Override
+    public Object evaluate(float fraction, Object startValue, Object endValue) {
+        String startColor = (String) startValue;
+        String endColor = (String) endValue;
+        int startRed = Integer.parseInt(startColor.substring(1, 3), 16);
+        int startGreen = Integer.parseInt(startColor.substring(3, 5), 16);
+        int startBlue = Integer.parseInt(startColor.substring(5, 7), 16);
+        int endRed = Integer.parseInt(endColor.substring(1, 3), 16);
+        int endGreen = Integer.parseInt(endColor.substring(3, 5), 16);
+        int endBlue = Integer.parseInt(endColor.substring(5, 7), 16);
+        // 初始化颜色的值
+        if (mCurrentRed == -1) {
+            mCurrentRed = startRed;
+        }
+        if (mCurrentGreen == -1) {
+            mCurrentGreen = startGreen;
+        }
+        if (mCurrentBlue == -1) {
+            mCurrentBlue = startBlue;
+        }
+        // 计算初始颜色和结束颜色之间的差值
+        int redDiff = Math.abs(startRed - endRed);
+        int greenDiff = Math.abs(startGreen - endGreen);
+        int blueDiff = Math.abs(startBlue - endBlue);
+        int colorDiff = redDiff + greenDiff + blueDiff;
+        if (mCurrentRed != endRed) {
+            mCurrentRed = getCurrentColor(startRed, endRed, colorDiff, 0,
+                    fraction);
+        } else if (mCurrentGreen != endGreen) {
+            mCurrentGreen = getCurrentColor(startGreen, endGreen, colorDiff,
+                    redDiff, fraction);
+        } else if (mCurrentBlue != endBlue) {
+            mCurrentBlue = getCurrentColor(startBlue, endBlue, colorDiff,
+                    redDiff + greenDiff, fraction);
+        }
+        // 将计算出的当前颜色的值组装返回
+        String currentColor = "#" + getHexString(mCurrentRed)
+                + getHexString(mCurrentGreen) + getHexString(mCurrentBlue);
+        return currentColor;
+    }
+
+    /**
+     * 根据fraction值来计算当前的颜色。
+     */
+    private int getCurrentColor(int startColor, int endColor, int colorDiff,
+                                int offset, float fraction) {
+        int currentColor;
+        if (startColor > endColor) {
+            currentColor = (int) (startColor - (fraction * colorDiff - offset));
+            if (currentColor < endColor) {
+                currentColor = endColor;
+            }
+        } else {
+            currentColor = (int) (startColor + (fraction * colorDiff - offset));
+            if (currentColor > endColor) {
+                currentColor = endColor;
+            }
+        }
+        return currentColor;
+    }
+
+    /**
+     * 将10进制颜色值转换成16进制。
+     */
+    private String getHexString(int value) {
+        String hexString = Integer.toHexString(value);
+        if (hexString.length() == 1) {
+            hexString = "0" + hexString;
+        }
+        return hexString;
+    }
+
+}
+```
+最后是自定义的View。
+
+```java
+package me.jarvischen.animationmechanism.advancepropertyanimation;
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.AttributeSet;
+import android.view.View;
+
+import me.jarvischen.animationmechanism.R;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class MyAnimView extends View {
+
+    private static final float RADIUS = 50.0f;
+
+    private Point currentPoint;
+
+    private Paint paint;
+
+    private String color;
+
+    public MyAnimView(Context context) {
+        this(context, null);
+    }
+
+    public MyAnimView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public MyAnimView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        paint = new Paint();
+        paint.setColor(getResources().getColor(R.color.colorAccent));
+        paint.setAntiAlias(true);
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+        paint.setColor(Color.parseColor(color));
+        invalidate();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (currentPoint == null) {
+            currentPoint = new Point(RADIUS, RADIUS);
+            drawCircle(canvas);
+            startAnimation();
+        } else {
+            drawCircle(canvas);
+        }
+    }
+
+    private void startAnimation() {
+        Point startPoint = new Point(RADIUS, RADIUS);
+        Point endPoint = new Point(getWidth() - RADIUS, getHeight() - RADIUS);
+        final ValueAnimator valueAnimator = ValueAnimator.ofObject(new PointEvaluator(), startPoint, endPoint);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                currentPoint = (Point) valueAnimator.getAnimatedValue();
+                invalidate();
+            }
+        });
+       /* valueAnimator.setDuration(2500);
+        valueAnimator.start();
+        valueAnimator.setRepeatCount(100);
+        valueAnimator.setRepeatMode(ValueAnimator.REVERSE);*/
+
+        ObjectAnimator anim2 = ObjectAnimator.ofObject(this, "color", new ColorEvaluator(),
+                "#0000FF", "#FF0000");
+        final AnimatorSet animSet = new AnimatorSet();
+        animSet.play(valueAnimator).with(anim2);
+        animSet.setDuration(2500);
+        animSet.start();
+    }
+
+    private void drawCircle(Canvas canvas) {
+        float x = currentPoint.getX();
+        float y = currentPoint.getY();
+        canvas.drawCircle(x, y, RADIUS, paint);
+    }
+}
+```
+
+[Android属性动画完全解析(下),nterpolator和ViewPropertyAnimator的用法](http://blog.csdn.net/guolin_blog/article/details/44171115)
+
+自定义Interpolator时,实现TimeInterpolator接口并实现他的方法即可。
+
+```java
+public class DecelerateAccelerateInterpolator implements TimeInterpolator {
+    @Override
+    public float getInterpolation(float input) {
+        float result;
+        if (input <= 0.5) {
+            result = (float) (Math.sin(Math.PI * input)) / 2;
+        } else {
+            result = (float) (2 - Math.sin(Math.PI * input)) / 2;
+        }
+        return result;
+    }
+}
+```
+
+ViewPropertyAnimator的用法。
+
+```java
+myAnimView.animate().alpha(0f);
+```
+
+```java
+textview.animate().x(500).y(500);
+```
+
+```java
+textview.animate().x(500).y(500).setDuration(5000)
+    .setInterpolator(new BounceInterpolator());
+```
+
