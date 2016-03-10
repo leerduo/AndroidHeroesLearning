@@ -24,7 +24,11 @@
         <activity android:name=".XformodeActivity" />
         <activity android:name=".XformodeActivity2" />
         <activity android:name=".BitmapShaderActivity" />
-        <activity android:name=".ReflectViewActivity"></activity>
+        <activity android:name=".ReflectViewActivity" />
+        <activity android:name=".PathEffectViewActivity" />
+        <activity android:name=".MySurfaceViewActivity" />
+        <activity android:name=".SimpleDrawWithSurfaceViewActivity" />
+        <activity android:name=".MyMathCurveWithSurfaceViewActivity"></activity>
     </application>
 
 </manifest>

@@ -2568,3 +2568,608 @@ paint.setStrokeCap(Paint.Cap.ROUND);
 
 在使用PorterDuffXfermode时,最好在绘图时关闭硬件加速,因为有些模式不支持硬件加速。
 
+### Shader
+
+Shader称为着色器、渲染器,它用来实现一系列的渐变、渲染效果,Android中的Shader包括以下几种
+
+* BitmapShader——位图Shader
+* LinearGradient——线性Shader
+* RadialGradient——光束Shader
+* SweepGradient——梯度Shader
+* ComposeShader——混合Shader
+
+与其他几个不同,BitmapShader产生的是一个图像,它的作用是通过Paint对画布进行指定Bitmap填充,填充时有以下几种模式选择：
+
+* CLAMP拉伸——拉伸的是图片的最后那一个像素
+* REPEAT重复——横向、纵向不断重复
+* MIRROR镜像——横向、纵向不断反转重复
+
+关于这个Shader,下面这个[博客](http://blog.csdn.net/aigestudio/article/details/41799811)阐述的很清楚。
+
+下面是BitmapShader的使用示例(讲一个矩形的图片变成一张圆形的图片)
+
+```java
+ private void init() {
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        paint = new Paint();
+        paint.setShader(bitmapShader);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawCircle(getWidth()/2 ,bitmap.getHeight()/2 + 100,200,paint);
+    }
+```
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/153428206998797874.jpg)
+
+再看看改变更改模式的效果如何：
+
+```java
+private void init() {
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        bitmapShader = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        paint = new Paint();
+        paint.setShader(bitmapShader);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawCircle(getWidth()/2 ,bitmap.getHeight()/2 + 100,200,paint);
+    }
+```
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/602647945883516863.jpg)
+
+再看看最常用的Shader---LinearGradient的用法：
+
+```java
+ private void init() {
+        paint = new Paint();
+        paint.setShader(new LinearGradient(0,0,400,400, Color.BLUE,Color.YELLOW,
+                Shader.TileMode.REPEAT));
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawRect(0,0,400,400,paint);
+    }
+```
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/368792901625564032.jpg)
+
+通常这些渐变效果不会单独直接的使用,而是会与前面的PorterDuffXformode结合一起使用,
+下面的实例是两个东西一起使用实现倒影效果的案例。
+
+* 先把原图复制一份并进行翻转
+
+```java
+ srcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+        Matrix matrix = new Matrix();
+        matrix.setScale(1F, -1F);
+        refBitmap = Bitmap.createBitmap(srcBitmap, 0, 0,
+                srcBitmap.getWidth(), srcBitmap.getHeight(), matrix, true);
+```
+
+`matrix.setScale(1F, -1F);`这个方法用来实现图片的垂直翻转。
+
+* 在onDraw方法中,首先绘制两张图：原图和倒影图,接下来,在倒影图上绘制一个图样大小的渐变矩形,
+并通过Mode.DST_IN模式绘制到倒影图中,从而形成一个具有过渡效果的渐变层。
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Shader;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class ReflectView extends View {
+
+    private Bitmap srcBitmap;
+    private Bitmap refBitmap;
+
+    private Paint paint;
+
+    private PorterDuffXfermode xfermode;
+
+    public ReflectView(Context context) {
+        this(context, null);
+    }
+
+    public ReflectView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ReflectView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        srcBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.test);
+        Matrix matrix = new Matrix();
+        matrix.setScale(1F, -1F);
+        refBitmap = Bitmap.createBitmap(srcBitmap, 0, 0,
+                srcBitmap.getWidth(), srcBitmap.getHeight(), matrix, true);
+
+        paint = new Paint();
+        paint.setShader(new LinearGradient(0, srcBitmap.getHeight(), 0,
+                srcBitmap.getHeight() + srcBitmap.getHeight() / 4,
+                0XDD000000, 0X10000000, Shader.TileMode.CLAMP));
+        xfermode = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawColor(Color.BLACK);
+        canvas.drawBitmap(srcBitmap, 0, 0, null);
+        canvas.drawBitmap(refBitmap, 0, srcBitmap.getHeight(), null);
+        paint.setXfermode(xfermode);
+        canvas.drawRect(0, srcBitmap.getHeight(), refBitmap.getWidth(), srcBitmap.getHeight()*2, paint);
+        paint.setXfermode(null);
+    }
+}
+```
+
+![图片倒影](http://7xljei.com1.z0.glb.clouddn.com/130363963826656789.jpg)
+
+### PathEffect
+
+这个类本身并没有做什么特殊的处理,只是继承了Object,通常我们使用的是它的几个子类。在使用的时候,通常是
+PathEffect pe = new 一个具体的子类;
+然后使用Paint的setPathEffect(PathEffect pe)方法即可。
+
+具体的如图所示：
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/422970989822569566.jpg)
+
+* 没加处理的效果
+
+* CornerPathEffect：
+
+这个类的作用就是将Path的各个连接线段之间的夹角用一种更平滑的方式连接,类似于圆弧与切线的效果。
+一般的,通过CornerPathEffect(float radius)指定一个具体的圆弧半径来实例化一个CornerPathEffect。
+
+* DiscretePathEffect：
+
+这个类的作用是打散Path的线段,使得在原来路径的基础上发生打散效果。
+一般的,通过构造DiscretePathEffect(float segmentLength,float deviation)来构造一个实例,其中,segmentLength指定最大的段长,
+deviation指定偏离量。
+
+* DashPathEffect：
+
+这个类的作用就是将Path的线段虚线化。
+构造函数为DashPathEffect(float[] intervals, float offset),其中intervals为虚线的ON和OFF数组,该数组的length必须大于等于2,
+phase为绘制时的偏移量。
+
+
+* PathDashPathEffect：
+
+这个类的作用是使用Path图形来填充当前的路径,其构造函数为PathDashPathEffect (Path shape, float advance, float phase,
+PathDashPathEffect.Stylestyle)。
+shape则是指填充图,advance指每个图形间的间距,phase为绘制时的偏移量,style为该类自由的枚举值,
+有三种情况：Style.ROTATE、Style.MORPH和
+Style.TRANSLATE。其中ROTATE的情况下,线段连接处的图形转换以旋转到与下一段移动方向相一致的角度进行转转,
+MORPH时图形会以发生拉伸或压缩等变形的情况与下一段相连接,TRANSLATE时，图形会以位置平移的方式与下一段相连接。
+
+* ComposePathEffect：
+
+组合效果，这个类需要两个PathEffect参数来构造一个实例,ComposePathEffect (PathEffect outerpe,PathEffect innerpe),表现时,
+会首先将innerpe表现出来,然后再在innerpe的基础上去增加outerpe的效果。
+
+## SurfaceView
+
+### SurfaceView和View的区别
+
+一般的View通过刷新来重绘视图,Android系统通过发出VSYNC信号来进行屏幕的重绘,刷新的时间间隔是16ms。
+如果在16ms内View完成了所需要执行的操作,那么用户在视觉上就不会产生卡顿的感觉;
+而如果执行的逻辑太多,特别是需要频繁刷新的界面,如游戏界面,那么就会不断的阻塞主线程,从而导致界面卡顿。
+为了避免这种问题,Android提供了SurfaceView来解决这个问题。
+SurfaceView和View的区别主要是下面几点：
+
+* View主要适用于主动更新的情况,而SurfaceView适用于被动更新,例如频繁的刷新。
+* View在主线程中对画面进行刷新,而SurfaceView通常会在一个子线程中进行页面的刷新。
+* View在绘图时没有使用双缓冲机制,而SurfaceView在底层实现了双缓冲机制。
+
+### SurfaceView的使用
+
+* 创建SurfaceView,一般继承自SurfaceView,并实现接口SurfaceHolderCallback。
+
+SurfaceHolderCallback接口的三个回调方法
+```java
+@Override
+public void surfaceCreated(SurfaceHolder holder) {
+  //做一些初始化操作，例如开启子线程通过循环来实现不停地绘制
+}
+
+@Override
+public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+}
+
+@Override
+public void surfaceDestroyed(SurfaceHolder holder) {
+}
+```
+
+* 初始化SurfaceView
+
+初始化SurfaceHolder对象，并设置Callback
+```java
+private void initView() {
+    mHolder = getHolder();
+    mHolder.addCallback(this);
+    ......
+}
+```
+
+* 使用SurfaceView
+
+通过lockCanvas方法获取Canvas对象进行绘制,并通过unlockCanvasAndPost方法对画布内容进行提交
+需要注意的是每次调用lockCanvas拿到的Canvas都是同一个Canvas对象,所以之前的操作都会保留,如果需要擦出,
+可以在绘制之前调用`drawColor`方法来进行清屏。
+```java
+private void draw() {
+    try {
+        mCanvas = mHolder.lockCanvas();
+        //mCanvas draw something
+    } catch (Exception e) {
+    } finally {
+        if (mCanvas != null)
+            mHolder.unlockCanvasAndPost(mCanvas);
+    }
+}
+```
+下面是模板代码：
+
+```java
+public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+
+    private SurfaceHolder mHolder;
+    private Canvas mCanvas;
+    private boolean mIsDrawing;
+    private Path mPath;
+    private Paint mPaint;
+
+    public MySurfaceView(Context context) {
+        super(context);
+        initView();
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initView();
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs,
+                      int defStyle) {
+        super(context, attrs, defStyle);
+        initView();
+    }
+
+    private void initView() {
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        this.setKeepScreenOn(true);
+        mPath = new Path();
+        mPaint = new Paint();
+        mPaint.setColor(Color.RED);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(40);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mIsDrawing = true;
+        new Thread(this).start();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mIsDrawing = false;
+    }
+
+    @Override
+    public void run() {
+        long start = System.currentTimeMillis();
+        while (mIsDrawing) {
+            draw();
+        }
+        long end = System.currentTimeMillis();
+        // 50 - 100ms，经验值
+        if (end - start < 100) {
+            try {
+                Thread.sleep(100 - (end - start));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void draw() {
+        try {
+            mCanvas = mHolder.lockCanvas();
+            mCanvas.drawColor(Color.WHITE);
+            mCanvas.drawPath(mPath, mPaint);
+        } catch (Exception e) {
+        } finally {
+            if (mCanvas != null)
+                mHolder.unlockCanvasAndPost(mCanvas);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mPath.moveTo(x, y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                mPath.lineTo(x, y);
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+        }
+        return true;
+    }
+}
+```
+
+### 案例：正弦曲线
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.AttributeSet;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class MySurfaceView  extends SurfaceView implements SurfaceHolder.Callback,Runnable{
+
+    private SurfaceHolder holder;
+
+    private Canvas canvas;
+
+    private boolean isDrawing;
+
+    private Path path;
+
+    private Paint paint;
+
+    private int x,y;
+
+    public MySurfaceView(Context context) {
+        this(context, null);
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public MySurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        holder = getHolder();
+        holder.addCallback(this);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        path = new Path();
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(getResources().getColor(R.color.colorAccent));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        isDrawing = true;
+        path.moveTo(0,400);
+        new Thread(this).start();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        isDrawing = false;
+    }
+
+    @Override
+    public void run() {
+        while (isDrawing){
+            draw();
+            x+=1;
+            y = (int) (100*Math.sin(x*2*Math.PI/180) + 400);
+            path.lineTo(x,y);
+        }
+    }
+
+    private void draw() {
+        try {
+            canvas = holder.lockCanvas();
+            canvas.drawColor(Color.WHITE);
+            canvas.drawPath(path,paint);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (canvas != null){
+                holder.unlockCanvasAndPost(canvas);
+            }
+        }
+    }
+}
+```
+
+效果如下：
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/530942805244665603.jpg)
+
+### 案例：复杂数学曲线的绘制
+
+来自[我的博客](http://chenfuduo.me/2016/01/29/fun-math-curves/)
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/S60129-161610.jpg)
+
+### 绘图板
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+/**
+ * Created by chenfuduo on 2016/3/10.
+ */
+public class SimpleDrawWithSurfaceView  extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+
+    private SurfaceHolder mHolder;
+    private Canvas mCanvas;
+    private boolean mIsDrawing;
+    private Path mPath;
+    private Paint mPaint;
+
+    public SimpleDrawWithSurfaceView(Context context) {
+        super(context);
+        initView();
+    }
+
+    public SimpleDrawWithSurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initView();
+    }
+
+    public SimpleDrawWithSurfaceView(Context context, AttributeSet attrs,
+                         int defStyle) {
+        super(context, attrs, defStyle);
+        initView();
+    }
+
+    private void initView() {
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        this.setKeepScreenOn(true);
+        mPath = new Path();
+        mPaint = new Paint();
+        mPaint.setColor(Color.RED);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(40);
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mIsDrawing = true;
+        new Thread(this).start();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mIsDrawing = false;
+    }
+
+    @Override
+    public void run() {
+        long start = System.currentTimeMillis();
+        while (mIsDrawing) {
+            draw();
+        }
+        long end = System.currentTimeMillis();
+        // 50 - 100ms，经验值
+        if (end - start < 100) {
+            try {
+                Thread.sleep(100 - (end - start));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void draw() {
+        try {
+            mCanvas = mHolder.lockCanvas();
+            mCanvas.drawColor(Color.WHITE);
+            mCanvas.drawPath(mPath, mPaint);
+        } catch (Exception e) {
+        } finally {
+            if (mCanvas != null)
+                mHolder.unlockCanvasAndPost(mCanvas);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mPath.moveTo(x, y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                mPath.lineTo(x, y);
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+        }
+        return true;
+    }
+}
+```
+
+这里时间的判断是因为我们不需要他那么频繁的刷新。
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/223678467572715827.jpg)
+

@@ -38,29 +38,52 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void flagBitmapMesh(View view){
+    public void flagBitmapMesh(View view) {
         Intent intent = new Intent(MainActivity.this, FlagBitmapMeshActivity.class);
         startActivity(intent);
     }
 
-    public void xformode(View view){
+    public void xformode(View view) {
         Intent intent = new Intent(MainActivity.this, XformodeActivity.class);
         startActivity(intent);
     }
 
-    public void xformode2(View view){
+    public void xformode2(View view) {
         Intent intent = new Intent(MainActivity.this, XformodeActivity2.class);
         startActivity(intent);
     }
 
-    public void bitmapShader(View view){
+    public void bitmapShader(View view) {
         Intent intent = new Intent(MainActivity.this, BitmapShaderActivity.class);
         startActivity(intent);
     }
 
-    public void reflectView(View view){
+    public void reflectView(View view) {
         Intent intent = new Intent(MainActivity.this, ReflectViewActivity.class);
         startActivity(intent);
     }
+
+    public void pathEffect(View view) {
+        Intent intent = new Intent(MainActivity.this, PathEffectViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void surfaceView(View view) {
+        Intent intent = new Intent(MainActivity.this, MySurfaceViewActivity.class);
+        startActivity(intent);
+    }
+
+
+    public void simpleDraw(View view) {
+        Intent intent = new Intent(MainActivity.this, SimpleDrawWithSurfaceViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void mathCurve(View view) {
+        Intent intent = new Intent(MainActivity.this, MyMathCurveWithSurfaceViewActivity.class);
+        startActivity(intent);
+    }
+
+
 
 }
