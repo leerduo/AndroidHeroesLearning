@@ -2001,7 +2001,570 @@ public class PixelsEffectActivity extends AppCompatActivity {
 
 ![效果图](http://7xljei.com1.z0.glb.clouddn.com/716746336819656539.jpg)
 
+## Android图像处理之图形特效处理
+
+### Android变形矩阵-Matrix
+
+通过Matrix类来操作图形矩阵的变换
+```java
+private float[] mImageMatrix=new float[9];
+Matrix matrix=new Matrix();
+matrix.setValues(mImageMatrix);
+//当获得一个变换矩阵以后通过以下代码将一个图像以这个变换矩阵的形式绘制出来
+canvas.drawBitmap(mBitmap,matrix,null);
+```
+以下是一些变换的方法：
+
+* setScale(); 缩放变换
+
+* setSkew(); 错切变换
+
+* setRotate(); 旋转变换
+
+* setTranslate(); 平移变换
+
+* pre()和post() 提供矩阵的前乘和后乘运算
+
+具体案例：
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <me.jarvischen.viewmechanism.ImageMatrixView
+        android:id="@+id/view"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
+
+    <GridLayout
+        android:id="@+id/grid_group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="3"
+        android:columnCount="3"
+        android:rowCount="3">
+
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="change"
+            android:text="Change" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="reset"
+            android:text="Reset" />
+    </LinearLayout>
+
+</LinearLayout>
+```
+
+ImageMatrixView.java
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class ImageMatrixView extends View {
+
+    private Matrix mMatrix;
+    private Bitmap mBitmap;
+
+    public ImageMatrixView(Context context) {
+        super(context);
+        initMyView();
+    }
+
+    public ImageMatrixView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initMyView();
+    }
+
+    public ImageMatrixView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initMyView();
+    }
+
+    public void setImageAndMatrix(Bitmap bm, Matrix matrix) {
+        mMatrix = matrix;
+        mBitmap = bm;
+    }
+
+    public void initMyView() {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        setImageAndMatrix(bitmap, new Matrix());
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawBitmap(mBitmap, 0, 0, null);
+        canvas.drawBitmap(mBitmap, mMatrix, null);
+    }
+}
+```
+ImageMatrixActivity.java
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.GridLayout;
+
+public class ImageMatrixActivity extends AppCompatActivity {
+    private GridLayout mGridGroup;
+    private ImageMatrixView mMyView;
+    private Bitmap mBitmap;
+    private int mEtWidth = 0;
+    private int mEtHeight = 0;
+    private float[] mImageMatrix = new float[9];
+    private EditText[] mETs = new EditText[9];
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_image_matrix);
+        mGridGroup = (GridLayout) findViewById(R.id.grid_group);
+        mMyView = (ImageMatrixView) findViewById(R.id.view);
+        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+
+        mGridGroup.post(new Runnable() {
+            @Override
+            public void run() {
+                mEtWidth = mGridGroup.getWidth() / 3;
+                mEtHeight = mGridGroup.getHeight() / 3;
+                addEts();
+                initImageMatrix();
+            }
+        });
+    }
+
+    private void addEts() {
+        for (int i = 0; i < 9; i++) {
+            EditText et = new EditText(ImageMatrixActivity.this);
+            et.setGravity(Gravity.CENTER);
+            mETs[i] = et;
+            mGridGroup.addView(et, mEtWidth, mEtHeight);
+        }
+    }
+
+    private void getImageMatrix() {
+        for (int i = 0; i < 9; i++) {
+            EditText et = mETs[i];
+            mImageMatrix[i] = Float.valueOf(et.getText().toString());
+        }
+    }
+
+    private void initImageMatrix() {
+        for (int i = 0; i < 9; i++) {
+            if (i % 4 == 0) {
+                mETs[i].setText(String.valueOf(1));
+            } else {
+                mETs[i].setText(String.valueOf(0));
+            }
+        }
+    }
+
+    public void change(View view) {
+        getImageMatrix();
+        Matrix matrix = new Matrix();
+        matrix.setValues(mImageMatrix);
+
+//        matrix.setRotate(45);
+//        matrix.postTranslate(200, 200);
+
+//        matrix.setTranslate(200, 200);
+//        matrix.preRotate(45);
+
+//        matrix.setScale(1, -1);
+//        matrix.postRotate(45);
+//        matrix.postTranslate(0, 200);
 
 
+        mMyView.setImageAndMatrix(mBitmap, matrix);
+        mMyView.invalidate();
+    }
 
+    public void reset(View view) {
+        initImageMatrix();
+        getImageMatrix();
+        Matrix matrix = new Matrix();
+        matrix.setValues(mImageMatrix);
+        mMyView.setImageAndMatrix(mBitmap, matrix);
+        mMyView.invalidate();
+    }
+}
+```
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/603693274204448598.jpg)
+
+
+### 像素块分析
+```java
+drawBitmapMesh(Bitmap bitmap,int meshWidth,int meshHeight,float[] verts,
+float vertOffset,int[] colors,int colorOffset,Paint paint);
+```
+方法可以把图像分成一个一个的小块进行处理，其中各个参数的含义如下：
+
+* bitmap——将要操作的图像
+* meshWidth——需要的横向网格数
+* meshHeight——需要的纵向网格数
+* verts——网格交叉点坐标数组
+* verftOffset——数组中开始跳过的（x，y）坐标数目
+* 其中meshWidth和meshHeight以及verts的对应关系为：
+
+```java
+float[] verts = new float[(meshWidth + 1) * (meshHeight + 1)]
+```
+
+下面的代码实现了飘扬的旗帜的效果：
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class FlagBitmapMeshView extends View {
+
+    private final int WIDTH = 200;
+    private final int HEIGHT = 200;
+    private int COUNT = (WIDTH + 1) * (HEIGHT + 1);
+    private float[] verts = new float[COUNT * 2];
+    private float[] orig = new float[COUNT * 2];
+    private Bitmap bitmap;
+    private float A;
+    private float k = 1;
+
+    public FlagBitmapMeshView(Context context) {
+        super(context);
+        initView(context);
+    }
+
+    public FlagBitmapMeshView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initView(context);
+    }
+
+    public FlagBitmapMeshView(Context context, AttributeSet attrs,
+                              int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initView(context);
+    }
+
+    private void initView(Context context) {
+        setFocusable(true);
+        bitmap = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.icon);
+        float bitmapWidth = bitmap.getWidth();
+        float bitmapHeight = bitmap.getHeight();
+        int index = 0;
+        for (int y = 0; y <= HEIGHT; y++) {
+            float fy = bitmapHeight * y / HEIGHT;
+            for (int x = 0; x <= WIDTH; x++) {
+                float fx = bitmapWidth * x / WIDTH;
+                orig[index * 2 + 0] = verts[index * 2 + 0] = fx;
+                orig[index * 2 + 1] = verts[index * 2 + 1] = fy + 100;
+                index += 1;
+            }
+        }
+        A = 50;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        flagWave();
+        k += 0.1F;
+        canvas.drawBitmapMesh(bitmap, WIDTH, HEIGHT,
+                verts, 0, null, 0, null);
+        invalidate();
+    }
+
+    private void flagWave() {
+        for (int j = 0; j <= HEIGHT; j++) {
+            for (int i = 0; i <= WIDTH; i++) {
+                verts[(j * (WIDTH + 1) + i) * 2 + 0] += 0;
+                float offsetY =
+                        (float) Math.sin((float) i / WIDTH * 2 * Math.PI +
+                                Math.PI * k);
+                verts[(j * (WIDTH + 1) + i) * 2 + 1] =
+                        orig[(j * WIDTH + i) * 2 + 1] + offsetY * A;
+            }
+        }
+    }
+}
+```
+在布局中使用该View即可。
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/494707027301025081.jpg)
+
+
+## Android图像处理之画笔特效处理
+
+### PorterDuffXfermode
+
+![PorterDuffXfermode](http://7xljei.com1.z0.glb.clouddn.com/20160120092932372.png)
+
+ProterDuffXfermode设置的是两个图层交集区域的显示方式,dst是先画的图形,而src是后画的图形。
+经常用到DST_IN、SRC_IN模式来实现将一个矩形图片变成圆角或者圆形图片的效果。
+如下：先用一个普通画笔画画一个遮罩层,再用带ProterDuffXfermode的画笔将图形画在罩层上,这样就可以通过上面所说的效果来混合两个图像了。
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ */
+public class XformodeView extends View {
+
+    private Bitmap bitmap;
+
+    private Bitmap out;
+
+    private Paint paint;
+
+    public XformodeView(Context context) {
+        this(context, null);
+    }
+
+    public XformodeView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public XformodeView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        out = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        canvas.drawRoundRect(0, 0, bitmap.getWidth(), bitmap.getHeight(), 160, 160, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawBitmap(out, 0, 0, null);
+    }
+}
+```
+在相应的布局中:
+```xml
+ <me.jarvischen.viewmechanism.XformodeView
+        android:id="@+id/test"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp" />
+```
+
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/297288634849395096.jpg)
+
+下面实现刮刮乐效果。
+
+```java
+package me.jarvischen.viewmechanism;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+
+/**
+ * Created by chenfuduo on 2016/3/9.
+ * 刮刮乐
+ */
+public class XformodeView2 extends View {
+
+    private Paint paint;
+
+    private Path path;
+
+    private Bitmap bgBitmap;
+
+    private Bitmap fgBitmap;
+
+    private Canvas canvas;
+
+
+    public XformodeView2(Context context) {
+        this(context, null);
+    }
+
+    public XformodeView2(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public XformodeView2(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+
+    private void init() {
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setAlpha(0);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(50);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+
+        path = new Path();
+
+        bgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        fgBitmap = Bitmap.createBitmap(bgBitmap.getWidth(), bgBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+
+        canvas = new Canvas(fgBitmap);
+        canvas.drawColor(Color.GRAY);
+    }
+
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawBitmap(bgBitmap, 0, 0, null);
+        canvas.drawBitmap(fgBitmap, 0, 0, null);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                path.reset();
+                path.moveTo(event.getX(), event.getY());
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                path.lineTo(event.getX(), event.getY());
+                break;
+        }
+        canvas.drawPath(path, paint);
+        invalidate();
+        return true;
+    }
+}
+```
+
+需要注意的是：
+
+第一,初始化一些东西：
+```java
+private void init() {
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setAlpha(0);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(50);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+
+        path = new Path();
+
+        bgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+        fgBitmap = Bitmap.createBitmap(bgBitmap.getWidth(), bgBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+
+        canvas = new Canvas(fgBitmap);
+        canvas.drawColor(Color.GRAY);
+    }
+```
+
+其中,
+```java
+paint.setStrokeJoin(Paint.Join.ROUND);
+paint.setStrokeCap(Paint.Cap.ROUND);
+```
+是让笔触和连接处更加圆滑一些。
+
+第二,获取用户手指滑动所产生的路径,使用Path保存用户手指划过的路径。
+```java
+@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                path.reset();
+                path.moveTo(event.getX(), event.getY());
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                path.lineTo(event.getX(), event.getY());
+                break;
+        }
+        canvas.drawPath(path, paint);
+        invalidate();
+        return true;
+    }
+```
+
+第三,需要将画笔的透明度设置为0,这样才能显示出擦除的效果。
+
+
+![刮刮乐](http://7xljei.com1.z0.glb.clouddn.com/353223673934444001.jpg)
+
+在使用PorterDuffXfermode时,最好在绘图时关闭硬件加速,因为有些模式不支持硬件加速。
 

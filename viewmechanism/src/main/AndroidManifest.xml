@@ -19,7 +19,12 @@
         <activity android:name=".PrimaryColorActivity" />
         <activity android:name=".ColorMatrixActivity" />
         <activity android:name=".PixelsEffectActivity" />
-        <activity android:name=".ImageMatrixActivity"></activity>
+        <activity android:name=".ImageMatrixActivity" />
+        <activity android:name=".FlagBitmapMeshActivity" />
+        <activity android:name=".XformodeActivity" />
+        <activity android:name=".XformodeActivity2" />
+        <activity android:name=".BitmapShaderActivity" />
+        <activity android:name=".ReflectViewActivity"></activity>
     </application>
 
 </manifest>

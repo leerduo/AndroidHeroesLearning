@@ -21,19 +21,68 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:background="@drawable/selectortest"
         android:onClick="pixelsEffect"
         android:text="跳转到PixelsEffect" />
 
     <Button
-        android:layout_below="@+id/btn_colormatrix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_colormatrix"
         android:background="@drawable/selectortest"
         android:onClick="imageMatrix"
         android:text="跳转到ImageMatrix" />
+
+    <Button
+        android:id="@+id/btn_flagBitmapMesh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btn_colormatrix"
+        android:background="@drawable/selectortest"
+        android:onClick="flagBitmapMesh"
+        android:text="跳转到FlagBitmapMesh" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_flagBitmapMesh"
+        android:background="@drawable/selectortest"
+        android:onClick="xformode"
+        android:text="跳转到Xformode" />
+
+    <Button
+        android:id="@+id/guaguale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_flagBitmapMesh"
+        android:background="@drawable/selectortest"
+        android:layout_alignParentRight="true"
+        android:onClick="xformode2"
+        android:layout_marginRight="20dp"
+        android:text="刮刮乐" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/guaguale"
+        android:background="@drawable/selectortest"
+        android:onClick="bitmapShader"
+        android:layout_marginRight="20dp"
+        android:text="跳转到bitmapShader" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/guaguale"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/selectortest"
+        android:onClick="reflectView"
+        android:layout_marginRight="20dp"
+        android:text="倒影效果" />
+
 
     <Button
         android:layout_width="wrap_content"

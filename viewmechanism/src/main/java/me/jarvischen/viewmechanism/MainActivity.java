@@ -37,4 +37,30 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ImageMatrixActivity.class);
         startActivity(intent);
     }
+
+    public void flagBitmapMesh(View view){
+        Intent intent = new Intent(MainActivity.this, FlagBitmapMeshActivity.class);
+        startActivity(intent);
+    }
+
+    public void xformode(View view){
+        Intent intent = new Intent(MainActivity.this, XformodeActivity.class);
+        startActivity(intent);
+    }
+
+    public void xformode2(View view){
+        Intent intent = new Intent(MainActivity.this, XformodeActivity2.class);
+        startActivity(intent);
+    }
+
+    public void bitmapShader(View view){
+        Intent intent = new Intent(MainActivity.this, BitmapShaderActivity.class);
+        startActivity(intent);
+    }
+
+    public void reflectView(View view){
+        Intent intent = new Intent(MainActivity.this, ReflectViewActivity.class);
+        startActivity(intent);
+    }
+
 }
