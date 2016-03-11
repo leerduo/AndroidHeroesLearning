@@ -201,6 +201,444 @@ public class MainActivity extends AppCompatActivity {
 [关于View的ScrollTo， getScrollX 和 getScrollY](http://www.xuebuyuan.com/2013505.html)
 [图解Android View的scrollTo(),scrollBy(),getScrollX(), getScrollY()](http://blog.csdn.net/bigconvience/article/details/26697645)
 
+这里实现一个类似AndroidScrollView的自定义ViewGroup。
+```java
+package me.jarvischen.customviewgroup_01;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Scroller;
+
+/**
+ * Created by chenfuduo on 2016/3/3.
+ */
+public class MyViewGroup extends ViewGroup {
+    private static final String TAG = "MyViewGroup";
+    private int mScreenHeight;
+    private Scroller mScroller;
+    private int mLastY;
+    private int mStart;
+
+    public MyViewGroup(Context context) {
+        super(context);
+        initView(context);
+    }
+
+    public MyViewGroup(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initView(context);
+    }
+
+    public MyViewGroup(Context context, AttributeSet attrs,
+                        int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initView(context);
+    }
+
+    private void initView(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+                Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(dm);
+        mScreenHeight = dm.heightPixels;
+        mScroller = new Scroller(context);
+    }
+
+    @Override
+    protected void onLayout(boolean changed,
+                            int l, int t, int r, int b) {
+        int childCount = getChildCount();
+        // 设置ViewGroup的高度
+        MarginLayoutParams mlp = (MarginLayoutParams) getLayoutParams();
+        mlp.height = mScreenHeight * childCount;
+        setLayoutParams(mlp);
+        for (int i = 0; i < childCount; i++) {
+            View child = getChildAt(i);
+            if (child.getVisibility() != View.GONE) {
+                child.layout(l, i * mScreenHeight,
+                        r, (i + 1) * mScreenHeight);
+            }
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec,
+                             int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int count = getChildCount();
+        for (int i = 0; i < count; ++i) {
+            View childView = getChildAt(i);
+            measureChild(childView,
+                    widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int y = (int) event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mLastY = y;
+                mStart = getScrollY();
+
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (!mScroller.isFinished()) {
+                    mScroller.abortAnimation();
+                }
+                int dy = mLastY - y;
+                Log.e(TAG, "onTouchEvent: MotionEvent.ACTION_MOVE-getScrollY()=" + getScrollY());
+                if (getScrollY() < 0) {
+                    dy = 0;
+                }
+                if (getScrollY() > getHeight() - mScreenHeight) {
+                    dy = 0;
+                }
+                scrollBy(0, dy);
+                mLastY = y;
+                break;
+            case MotionEvent.ACTION_UP:
+                int dScrollY = checkAlignment();
+                if (dScrollY > 0) {
+                    if (dScrollY < mScreenHeight / 3) {
+                        mScroller.startScroll(
+                                0, getScrollY(),
+                                0, -dScrollY);
+                    } else {
+                        mScroller.startScroll(
+                                0, getScrollY(),
+                                0, mScreenHeight - dScrollY);
+                    }
+                } else {
+                    if (-dScrollY < mScreenHeight / 3) {
+                        mScroller.startScroll(
+                                0, getScrollY(),
+                                0, -dScrollY);
+                    } else {
+                        mScroller.startScroll(
+                                0, getScrollY(),
+                                0, -mScreenHeight - dScrollY);
+                    }
+                }
+                break;
+        }
+        postInvalidate();
+        return true;
+    }
+
+    private int checkAlignment() {
+        int mEnd = getScrollY();
+        boolean isUp = ((mEnd - mStart) > 0) ? true : false;
+        int lastPrev = mEnd % mScreenHeight;
+        int lastNext = mScreenHeight - lastPrev;
+        if (isUp) {
+            //向上的
+            return lastPrev;
+        } else {
+            return -lastNext;
+        }
+    }
+
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        if (mScroller.computeScrollOffset()) {
+            scrollTo(0, mScroller.getCurrY());
+            postInvalidate();
+        }
+    }
+}
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <me.jarvischen.customviewgroup_01.MyViewGroup
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/test1" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/test2" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/test3" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/test4" />
+
+    </me.jarvischen.customviewgroup_01.MyViewGroup>
+</LinearLayout>
+```
+
+关于Scroller的用法,参考这个文章。
+
+[Android Scroller完全解析，关于Scroller你所需知道的一切 ](http://blog.csdn.net/guolin_blog/article/details/48719871)
+
+
+## 事件拦截机制分析
+
+事件拦截机制,这里只是做了简单的分析。
+
+为了方便了解整个事件传递的机制，我们设计一个场景：
+
+![事件拦截机制分析](http://7xljei.com1.z0.glb.clouddn.com/MotionEvent.png)
+
+角色：
+一个经理：MotionEventViewGroupA,最外层的ViewGroupA；
+一个组长：MotionEventViewGroupB,中间的ViewGroupB；
+一个你：MotionEventViewC,最底层的码农。
+模拟：
+经理分派任务,下属处理这个任务的过程。
+
+MotionEventViewGroupA
+
+```java
+public class MotionEventViewGroupA extends LinearLayout {
+    public MotionEventViewGroupA(Context context) {
+        super(context);
+    }
+
+    public MotionEventViewGroupA(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MotionEventViewGroupA(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+ @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.e("cfd", "MotionEventViewGroupA dispatchTouchEventA");
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.e("cfd", "MotionEventViewGroupA onInterceptTouchEventA");
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.e("cfd", "MotionEventViewGroupA onTouchEventA");
+        return super.onTouchEvent(event);
+    }
+
+}
+```
+
+MotionEventViewGroupB
+
+```java
+public class MotionEventViewGroupB extends LinearLayout {
+
+    public MotionEventViewGroupB(Context context) {
+        super(context);
+    }
+
+    public MotionEventViewGroupB(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MotionEventViewGroupB(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+ @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.e("cfd", "MotionEventViewGroupB dispatchTouchEventB");
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.e("cfd", "MotionEventViewGroupB onInterceptTouchEventB");
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.e("cfd", "MotionEventViewGroupB onTouchEventB");
+        return super.onTouchEvent(event);
+    }
+}
+
+```
+MotionEventViewC
+
+```java
+public class MotionEventViewC extends View {
+    public MotionEventViewC(Context context) {
+        super(context);
+    }
+
+    public MotionEventViewC(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MotionEventViewC(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.e("cfd", "MotionEventViewC dispatchTouchEventC");
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.e("cfd", "MotionEventViewC onTouchEventC");
+        return super.onTouchEvent(event);
+    }
+}
+```
+xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <me.jarvischen.motionevent.MotionEventViewGroupA
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@android:color/holo_orange_dark"
+        android:gravity="center">
+
+        <me.jarvischen.motionevent.MotionEventViewGroupB
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:background="@android:color/holo_purple"
+            android:gravity="center">
+
+            <me.jarvischen.motionevent.MotionEventViewC
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:background="@android:color/holo_green_dark"
+                android:gravity="center" />
+        </me.jarvischen.motionevent.MotionEventViewGroupB>
+    </me.jarvischen.motionevent.MotionEventViewGroupA>
+</FrameLayout>
+
+ViewGroup级别比较高,比View多一个onInterceptTouchEvent（拦截）。
+情景分析
+不做任何修改,点击MotionEventViewC
+
+```
+MotionEventViewGroupA dispatchTouchEventA
+MotionEventViewGroupA onInterceptTouchEventA
+MotionEventViewGroupB dispatchTouchEventB
+MotionEventViewGroupB onInterceptTouchEventB
+MotionEventViewC dispatchTouchEventC
+MotionEventViewC onTouchEventC
+MotionEventViewGroupB onTouchEventB
+MotionEventViewGroupA onTouchEventA
+```
+
+log信息看出，正常情况，事件传递顺序：
+经理 –> 组长 –> 你,先执行dispatchTouchEvent（分发）,再执行onInterceptTouchEvent（拦截）
+
+事件处理顺序：
+你 –> 组长 –> 经理,事件处理都是执行onTouchEvent（处理）。
+
+事件传递返回值：true，拦截,交给自己的onTouchEvent处理;false,不拦截,传给下属。
+
+事件处理返回值：true,自己搞定,不用上报上司;false,上报上司处理。
+
+初始返回都是false。
+
+事件传递,dispatchTouchEvent一般不太会改写,只关心onInterceptTouchEvent。
+经理觉得这个任务太简单,自己处理
+
+即MotionEventViewGroupA里onInterceptTouchEvent返回true，我们看下log信息：
+
+```
+MotionEventViewGroupA dispatchTouchEventA
+MotionEventViewGroupA onInterceptTouchEventA
+MotionEventViewGroupA onTouchEventA
+```
+
+经理一个人干完了,没下面的人什么事了。
+组长觉得这个任务太简单,自己处理
+
+即MotionEventViewGroupB里onInterceptTouchEvent返回true,我们看下log信息：
+
+```
+MotionEventViewGroupA dispatchTouchEventA
+MotionEventViewGroupA onInterceptTouchEventA
+MotionEventViewGroupB dispatchTouchEventB
+MotionEventViewGroupB onInterceptTouchEventB
+MotionEventViewGroupB onTouchEventB
+MotionEventViewGroupA onTouchEventA
+```
+
+组长干完了活,没你啥事了。以上对事件的分发、拦截的分析。
+你迫于压力,辞职不干了,任务闲置
+
+即MotionEventViewC里onTouchEvent返回true，我们看下log信息：
+
+```
+MotionEventViewGroupA dispatchTouchEventA
+MotionEventViewGroupA onInterceptTouchEventA
+MotionEventViewGroupB dispatchTouchEventB
+MotionEventViewGroupB onInterceptTouchEventB
+MotionEventViewC dispatchTouchEventC
+MotionEventViewC onTouchEventC
+```
+
+事件处理到你这里就结束了。
+组长觉得你任务完成太烂，不敢上报
+
+即MotionEventViewB里onTouchEvent返回true,我们看下log信息：
+
+```
+MotionEventViewGroupA dispatchTouchEventA
+MotionEventViewGroupA onInterceptTouchEventA
+MotionEventViewGroupB dispatchTouchEventB
+MotionEventViewGroupB onInterceptTouchEventB
+MotionEventViewC dispatchTouchEventC
+MotionEventViewC onTouchEventC
+MotionEventViewGroupB onTouchEventB
+```
+
+事件处理经过你和组长,到组长那里就结束了。
+
+
+具体的参考这里的博客。
+
+![Android事件分发机制完全解析,带你从源码的角度彻底理解(上)](http://blog.csdn.net/guolin_blog/article/details/9097463)
+![Android事件分发机制完全解析,带你从源码的角度彻底理解(下)](http://blog.csdn.net/guolin_blog/article/details/9153747)
+
 # Android Scroll分析
 
 ## Android坐标系

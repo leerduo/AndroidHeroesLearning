@@ -3,6 +3,7 @@ package me.jarvischen.customviewgroup_01;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,11 @@ import android.widget.Scroller;
  * Created by chenfuduo on 2016/3/3.
  */
 public class MyViewGroup extends ViewGroup {
+    private static final String TAG = "MyViewGroup";
     private int mScreenHeight;
     private Scroller mScroller;
     private int mLastY;
     private int mStart;
-    private int mEnd;
 
     public MyViewGroup(Context context) {
         super(context);
@@ -80,12 +81,14 @@ public class MyViewGroup extends ViewGroup {
             case MotionEvent.ACTION_DOWN:
                 mLastY = y;
                 mStart = getScrollY();
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
                 int dy = mLastY - y;
+                Log.e(TAG, "onTouchEvent: MotionEvent.ACTION_MOVE-getScrollY()=" + getScrollY());
                 if (getScrollY() < 0) {
                     dy = 0;
                 }
