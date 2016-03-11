@@ -89,5 +89,13 @@
 
     </LinearLayout>
 
+    <Button
+        android:text="跳转到下拉展开动画"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnDrop"
+        android:background="@drawable/selectortest"
+        />
+
 
 </LinearLayout>

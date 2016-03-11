@@ -20,7 +20,8 @@
         <activity android:name=".advancepropertyanimation.PropertyAnimationAdvanceActivity" />
         <activity android:name=".advancepropertyanimation.PropertyValuesHolderActivity" />
         <activity android:name=".advancepropertyanimation.SVGActivity" />
-        <activity android:name=".advancepropertyanimation.AdvancePropertyAnimActivity_demo"></activity>
+        <activity android:name=".advancepropertyanimation.AdvancePropertyAnimActivity_demo" />
+        <activity android:name=".advancepropertyanimation.PropertyAnimDropViewActivity"></activity>
     </application>
 
 </manifest>

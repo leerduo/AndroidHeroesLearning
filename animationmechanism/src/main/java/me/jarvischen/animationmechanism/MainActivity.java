@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import me.jarvischen.animationmechanism.advancepropertyanimation.AdvancePropertyAnimActivity_demo;
 import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation;
 import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation2;
+import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyAnimDropViewActivity;
 import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyAnimationAdvanceActivity;
 import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyValuesHolderActivity;
 import me.jarvischen.animationmechanism.advancepropertyanimation.SVGActivity;
@@ -70,8 +71,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void btnDrop(View view) {
+        Intent intent = new Intent(MainActivity.this, PropertyAnimDropViewActivity.class);
+        startActivity(intent);
+    }
 
-    public void imgClose(View view){
+
+    public void imgClose(View view) {
         CustomAnimation ca = new CustomAnimation();
         view.startAnimation(ca);
     }
