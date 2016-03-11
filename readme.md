@@ -3811,3 +3811,108 @@ public class CustomAnim extends Animation {
 }
 ```
 
+## Android 5.X SVG矢量动画机制
+
+
+SVG是什么：
+
+* 可伸缩矢量图形(Scalable Vector Graphics)
+* 定义用于网络的基于矢量的图形
+* 使用xml格式定义图形
+* 图像在放大或者改变尺寸的情况下其图形质量不会有损失
+* 万维网联盟的标准
+* 与诸如DOM和XSL之类的W3C标准是一个整体
+
+### <path>标签
+
+使用<path>标签创建SVG，就像用指令的方式来控制一只画笔。标签所支持的指令有以下几种：
+
+* M=moveto(M X,Y)：将画笔移动到指定的坐标位置,但未发生绘制。
+* L=lineto(L X,Y)：画直线到指定的坐标位置。
+* H=horizontal lineto(H X)：画水平线到指定的X坐标位置。
+* V=vertical lineto(V Y)：画水平线到指定的Y坐标位置。
+* C=curveto(C X1,Y1,X2,Y2,ENDX,ENDY)：三次贝塞尔曲线。
+* S=smooth curveto(S X2,Y2,ENDX,ENDY)：三次贝塞尔曲线。
+* Q=quadratic Belzier curve(Q X,Y,ENDX,ENDY)：二次贝塞尔曲线。
+* T=smooth quadratic Belzier curveto(T ENDX,ENDY)：映射前面路径后的终点。
+* A=elliptical Arc(A RX,RY,XROTATION,FLAG1,FLAG2,X,Y)：弧形。
+RX、RY为半轴大小,XROTATION指椭圆的X轴水平方向顺时针方向夹角,FLAG1为1时表示大角度弧形,为0表小角度,
+FLAG2为1时表顺时针,0位逆时针,X、Y为终点坐标。
+* Z=closepath()：关闭路径。
+
+注意：
+坐标轴以(0,0)为中心,X轴水平向右,Y轴水平向下。
+所有指令大小写均可。大写绝对定位,参照全局坐标系;小写相对定位,参照父容器坐标系。
+指令和数据间的空格可以省略。
+同一指令出现多次可以只用一个。
+
+
+### SVG编辑器
+
+书中介绍了个Inkscape,有兴趣的可以尝试下。
+还有个[在线的](http://editor.method.ac/)。
+
+### Android中使用SVG
+
+谷歌在Android 5.X中提供了VectorDrawable、AnimatedVectorDrawable来帮助支出SVG。
+
+#### VectorDrawable
+
+直接在res/drawable下新建文件即可。在XML中创建静态的SVG图形,通常会形成SVG树形结构。
+
+```xml
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:width="200dp"
+android:height="200dp"//控制SVG图形的具体大小,height与width的比例需和viewportHeight与viewportWidth的相同,不然会变形
+android:viewportHeight="100"
+android:viewportWidth="100">//图形划分的比例，这里指划分100*100，绘制图形使用坐标（50,50）即为中心点
+ <group
+        android:name="test"
+        android:rotation="0">
+        <path
+            android:fillColor="@color/colorAccent"
+            android:pathData="M 25 50
+            a 25,25 0 1,0 50,0" />
+        <path
+            android:strokeColor="@color/colorAccent"
+            android:strokeWidth="2"
+            android:pathData="M 25 0
+            a 25,25 0 1,0 50,0" />
+    </group>
+</vector>
+```
+
+效果图如下:
+
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20160311142903.png)
+
+#### AnimatedVectorDrawable
+
+AnimatedVectorDrawable就是给VectorDrawable提供动画效果,通过它来连接静态的VectorDrawable和动态的objectAnimator。
+
+```xml
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" android:drawable="@drawable/vector_demo">
+<target
+   android:animation="@anim/anim"
+   android:name="test"/>//这里的name需要和vectordrawable里的name一样
+</animated-vector>
+```
+动画代码如下：
+```xml
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+   android:duration="3000"
+   android:propertyName="rotation"//path中的属性
+   android:valueFrom="0"
+   android:valueTo="360">
+</objectAnimator>
+```
+具体使用如下：
+```java
+((Animatable)imageView.getDrawable()).start();
+```
+
+下面是几个综合实例的效果图：
+![效果图](http://7xljei.com1.z0.glb.clouddn.com/svganim.gif)
+
+整个代码在SVGActivity.java中,这里不贴代码了。
+

@@ -18,7 +18,8 @@
         <activity android:name=".ViewAnimationActivity" />
         <activity android:name=".BasicPropertyAnimationActivity" />
         <activity android:name=".advancepropertyanimation.PropertyAnimationAdvanceActivity" />
-        <activity android:name=".advancepropertyanimation.PropertyValuesHolderActivity"></activity>
+        <activity android:name=".advancepropertyanimation.PropertyValuesHolderActivity" />
+        <activity android:name=".advancepropertyanimation.SVGActivity"></activity>
     </application>
 
 </manifest>
