@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import me.jarvischen.animationmechanism.advancepropertyanimation.AdvancePropertyAnimActivity_demo;
 import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation;
 import me.jarvischen.animationmechanism.advancepropertyanimation.CustomAnimation2;
 import me.jarvischen.animationmechanism.advancepropertyanimation.PropertyAnimationAdvanceActivity;
@@ -64,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void btnMenu(View view) {
+        Intent intent = new Intent(MainActivity.this, AdvancePropertyAnimActivity_demo.class);
+        startActivity(intent);
+    }
 
 
     public void imgClose(View view){

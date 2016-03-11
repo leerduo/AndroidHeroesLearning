@@ -53,6 +53,14 @@
         android:background="@drawable/selectortest"
         />
 
+    <Button
+        android:text="跳转到灵动菜单"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnMenu"
+        android:background="@drawable/selectortest"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
