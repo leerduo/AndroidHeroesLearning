@@ -17,4 +17,21 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this,BaseListViewActivity.class);
         startActivity(intent);
     }
+
+    public void scrollToHide(View view){
+        Intent intent = new Intent(MainActivity.this,ScrollToHideActivity.class);
+        startActivity(intent);
+    }
+    public void scrollToChat(View view){
+        Intent intent = new Intent(MainActivity.this,ChatListActivity.class);
+        startActivity(intent);
+    }
+
+    public void focusListView(View view){
+        Intent intent = new Intent(MainActivity.this,FocusListViewActivity.class);
+        startActivity(intent);
+    }
+
+
+
 }

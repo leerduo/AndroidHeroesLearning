@@ -639,9 +639,470 @@ MotionEventViewGroupB onTouchEventB
 ![Android事件分发机制完全解析,带你从源码的角度彻底理解(上)](http://blog.csdn.net/guolin_blog/article/details/9097463)
 ![Android事件分发机制完全解析,带你从源码的角度彻底理解(下)](http://blog.csdn.net/guolin_blog/article/details/9153747)
 
+
+# Android ListView使用技巧
+
+在Android应用中,ListView作为列表展示的控件,是一个很常用的控件。在大量场合下,我们都会用到这个控件,整理一下常用的技巧。
+
+## ListView常用技巧
+
+### 使用ViewHolder模式提高效率
+
+ViewHolder模式充分利用ListView的视图缓存机制,避免了每次调用getView()的时候都去通过findViewById()实例化控件。
+效率与不使用相比,效率提高50%以上。只需要在自定义Adapter中定义内部ViewHolder类，代码如下：
+```java
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder = null;
+        //判断是否缓存
+        if(convertView == null){
+            convertView = inflater.inflate(R.layout.listitem, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.tv = (TextView) convertView.findViewById(R.id.tv);
+            viewHolder.img = (ImageView) convertView.findViewById(R.id.img);
+            viewHolder.btn =(Button) convertView.findViewById(R.id.btn);
+            convertView.setTag(viewHolder);
+        }else{
+            //通过tag找到缓存的布局
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+        return convertView;
+    }
+
+    final class ViewHolder{
+        public TextView tv;
+        public ImageView img;
+        public Button btn;
+    }
+```
+
+### 设置分割线
+
+xml中
+//设置分割线透明，一般在item用view设置自己的分割线
+```xml
+android:divider="@null"
+```
+//代码中
+
+```java
+listView.setDivider(Drawable);
+```
+
+### 设置ListView的item点击效果
+
+```xml
+//xml中设置item点击效果为透明
+android:listSelector="@android:color/transparent"
+//设置item的BackGround为自己想要的点击效果
+```
+
+### 设置ListView显示在第几项
+
+```java
+//类似scrollTo瞬间移动完成
+listView.setSelection(int );
+//平滑移动
+listView.smoothScrollByOffset(offset);
+listView.smoothScrollBy(distance, duration);
+listView.smoothScrollToPosition(position);
+```
+
+### 动态修改ListView
+
+```java
+//当数据源改变时，只需要调用此方法即可改变ListView展示的内容
+adapter.notifyDataSetChanged();
+```
+
+
+### 遍历ListView中的所有Item
+
+```java
+for(int i=0;i<listView.getChildCount();i++){
+            View view = listView.getChildAt(i);
+        }
+```
+
+### 处理空ListView
+
+```xml
+<!-- ListView 空视图必须跟ListView放在一起 -->
+
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent" />
+
+    <ImageView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_launcher" />
+
+</FrameLayout>
+```
+
+```java
+<!-- 代码中设置,有数据时不会显示,没有时才显示 -->
+
+listView.setEmptyView(View);
+```
+
+
+## ListView滑动监听
+
+### OnTouchListener
+
+通过坐标判断用户滑动的方向,并进行相应的逻辑处理。
+```java
+listView.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                //触摸时逻辑
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                //移动时逻辑
+                    break;
+                case MotionEvent.ACTION_UP:
+                //离开时逻辑
+                    break;
+                }
+                return false;
+            }
+        });
+```
+
+### OnScrollListener
+
+既是对ListView滑动状态的监听,常用的方法代码如下：
+
+```java
+listView.setOnScrollListener(new OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(ZrcAbsListView view, int scrollState) {
+                switch(scrollState){
+                case SCROLL_STATE_IDLE:
+                    //滑动停止时
+                    break;
+                case SCROLL_STATE_TOUCH_SCROLL:
+                    //正在滚动时
+                    break;
+                case SCROLL_STATE_FLING:
+                    //手指抛动，惯性滑动时
+                    break;
+                }
+
+            }
+
+            /**
+             *
+             *  int firstVisibleItem:当前能看见的第一个Item ID
+             *  int visibleItemCount:当前能看见的item总数
+             *  int totalItemCount:挣个istview的tem总数
+             *
+             * */
+            private int lastVisiableItem;
+            @Override
+            public void onScroll(ZrcAbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                //滚动时一直调用
+                if(firstVisibleItem+visibleItemCount==totalItemCount&&totalItemCount>0){
+                    //滚动到最后一行
+                }
+
+                if(firstVisibleItem>lastVisiableItem){
+                    //上滑
+                }else{
+                    //下滑
+                }
+                lastVisiableItem = firstVisibleItem;
+
+            }
+        });
+
+        //获取可视区域内第一个item id
+        listView.getFirstVisiblePosition();
+        //获取可视区域内最后一个item id
+        listView.getLastVisiblePosition();
+```
+
+
+上面的代码提供了判断了ListView滑动方向判断的方法。
+
+## ListView的扩展
+
+### 具有弹性的ListView
+
+介绍一种很简单的控制滑动到边缘的方法,如下：
+
+```java
+/**
+*
+* @param maxOverScrollX Number of pixels to overscroll by *in *either direction along the X axis.
+* @param maxOverScrollY Number of pixels to overscroll by
+*  in either direction along the Y axis.
+** /
+
+@Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY,
+            int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX,
+                 mMaxOverDistance, isTouchEvent);
+    }
+```
+
+完整的弹性ListView如下：
+
+```java
+public class MyListView extends ListView {
+    private Context mContext;
+    private int mMaxOverDistance = 50;
+
+    public MyListView(Context context) {
+        super(context);
+        mContext = context;
+        initView();
+    }
+
+    public MyListView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        mContext = context;
+        initView();
+    }
+
+    public MyListView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        mContext = context;
+        initView();
+    }
+
+    @SuppressLint("NewApi")
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY,
+            int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX,
+                 mMaxOverDistance, isTouchEvent);
+    }
+
+    private void initView() {
+        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        float density = metrics.density;
+        mMaxOverDistance = (int) (density * mMaxOverDistance);
+    }
+
+}
+```
+
+### 自定显示、隐藏布局的ListView
+
+```java
+public class MyActivity extends Activity {
+    private Toolbar mToolbar;
+    private ListView mListView;
+    private String[] mStr = new String[20];
+    private int mTouchSlop;
+    private float mFirstY;
+    private float mCurrentY;
+    private int direction;
+    private ObjectAnimator mAnimator;
+    private boolean mShow = true;
+
+
+    View.OnTouchListener myTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mFirstY = event.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    mCurrentY = event.getY();
+                    Log.e("mess", "-----currentY=" + mCurrentY + ",firstY=" + mFirstY + ",======" + (mCurrentY - mFirstY));
+                    if (mCurrentY - mFirstY > mTouchSlop) {
+                        direction = 0;//down;
+                    } else if (mFirstY - mCurrentY > mTouchSlop) {
+                        direction = 1;//up
+                    }
+                    if (direction == 1) {
+                        if (mShow) {
+                            toolbarAnim(1);//hide
+                            mShow = !mShow;
+                        }
+                    } else if (direction == 0) {
+                        if (!mShow) {
+                            toolbarAnim(0);//show
+                            mShow = !mShow;
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+    };
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.scroll_hide);
+        mListView = (ListView) findViewById(R.id.listview);
+        View header = new View(this);
+        header.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(
+                R.dimen.abc_action_bar_default_height_material)));
+        mListView.addHeaderView(header);
+        mTouchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        for (int i = 0; i < mStr.length; i++) {
+            mStr[i] = "item" + i;
+        }
+        mListView.setAdapter(new ArrayAdapter<String>(MyActivity.this, android.R.layout.simple_expandable_list_item_1, mStr));
+        mListView.setOnTouchListener(myTouchListener);
+    }
+
+
+    private void toolbarAnim(int flag) {
+        if (mAnimator != null && mAnimator.isRunning()) {
+            mAnimator.cancel();
+        }
+        //mToolbar.getTranslationY()获取View的绝对位置，
+        Log.e("MyActivity","transtionY=============="+mToolbar.getTranslationY()+",height========="+mToolbar.getHeight());
+        if (flag == 0) {//show toolbar down,从mToolbar.getTranslationY()位置，移动到当前位置 y ,
+            mAnimator = ObjectAnimator.ofFloat(mToolbar, "translationY", mToolbar.getTranslationY(), 0);
+        } else {//hide toolbar up，从当前位置，移动到mToolbar.getTranslationY()位置 y
+            mAnimator = ObjectAnimator.ofFloat(mToolbar, "translationY", mToolbar.getTranslationY(), -mToolbar.getHeight());
+        }
+        mAnimator.start();
+    }
+
+}
+```
+
+
+### 动态改变ListView布局
+
+一般有2种方式：
+
+* 两种布局写在一起,通过控制布局的隐藏、显示,控制切换布局;
+* 通过判断来选择加载不同的布局
+
+以第二种方式来作为示例：
+
+```java
+public class FocusListViewTest extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.focus);
+        ListView listView = (ListView) findViewById(R.id.focus_listView);
+        List<String> data = new ArrayList<String>();
+        data.add("I am item 1");
+        data.add("I am item 2");
+        data.add("I am item 3");
+        data.add("I am item 4");
+        data.add("I am item 5");
+        final FocusListViewAdapter adapter = new FocusListViewAdapter(this, data);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                adapter.setCurrentItem(position);
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+}
+```
+
+```java
+public class FocusListViewAdapter extends BaseAdapter {
+
+    private List<String> mData;
+    private Context mContext;
+    private int mCurrentItem = 0;
+
+    public FocusListViewAdapter(Context context, List<String> data) {
+        this.mContext = context;
+        this.mData = data;
+    }
+
+    @Override
+    public int getCount() {
+        return mData.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mData.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        LinearLayout layout = new LinearLayout(mContext);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        if (mCurrentItem == position) {
+            layout.addView(addFocusView(position));
+        } else {
+            layout.addView(addNormalView(position));
+        }
+        return layout;
+    }
+
+    public void setCurrentItem(int currentItem) {
+        this.mCurrentItem = currentItem;
+    }
+
+    private View addFocusView(int i) {
+        ImageView iv = new ImageView(mContext);
+        iv.setImageResource(R.drawable.ic_launcher);
+        return iv;
+    }
+
+    private View addNormalView(int i) {
+        LinearLayout layout = new LinearLayout(mContext);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        ImageView iv = new ImageView(mContext);
+        iv.setImageResource(R.drawable.in_icon);
+        layout.addView(iv, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        TextView tv = new TextView(mContext);
+        tv.setText(mData.get(i));
+        layout.addView(tv, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        layout.setGravity(Gravity.CENTER);
+        return layout;
+    }
+}
+```
+
 # Android Scroll分析
 
 ## Android坐标系
+
+[android之位置坐标](http://blog.csdn.net/zxc123e/article/details/41869833)
 
 Android中，将屏幕最左上角的顶点作为Android坐标系的原点,从这个点向右是X轴正方向,从这个点向下是Y轴正方向。
 

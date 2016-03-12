@@ -15,7 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BaseListViewActivity"></activity>
+        <activity android:name=".BaseListViewActivity" />
+        <activity android:name=".ScrollToHideActivity" />
+        <activity android:name=".ChatListActivity" />
+        <activity android:name=".FocusListViewActivity"></activity>
     </application>
 
 </manifest>
