@@ -17,8 +17,9 @@
         </activity>
         <activity android:name=".BaseListViewActivity" />
         <activity android:name=".ScrollToHideActivity" />
-        <activity android:name=".ChatListActivity" />
-        <activity android:name=".FocusListViewActivity"></activity>
+        <activity android:name="drawable.ChatListActivity" />
+        <activity android:name=".FocusListViewActivity" />
+        <activity android:name=".ChatListActivity"></activity>
     </application>
 
 </manifest>

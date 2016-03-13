@@ -409,9 +409,10 @@ public class MyViewGroup extends ViewGroup {
 ![事件拦截机制分析](http://7xljei.com1.z0.glb.clouddn.com/MotionEvent.png)
 
 角色：
-一个经理：MotionEventViewGroupA,最外层的ViewGroupA；
-一个组长：MotionEventViewGroupB,中间的ViewGroupB；
-一个你：MotionEventViewC,最底层的码农。
+* 一个经理：MotionEventViewGroupA,最外层的ViewGroupA;
+* 一个组长：MotionEventViewGroupB,中间的ViewGroupB;
+* 一个你：MotionEventViewC,最底层的码农
+
 模拟：
 经理分派任务,下属处理这个任务的过程。
 
@@ -549,8 +550,13 @@ xml
         </me.jarvischen.motionevent.MotionEventViewGroupB>
     </me.jarvischen.motionevent.MotionEventViewGroupA>
 </FrameLayout>
+```
+
+
 
 ViewGroup级别比较高,比View多一个onInterceptTouchEvent（拦截）。
+
+
 情景分析
 不做任何修改,点击MotionEventViewC
 
@@ -565,20 +571,23 @@ MotionEventViewGroupB onTouchEventB
 MotionEventViewGroupA onTouchEventA
 ```
 
-log信息看出，正常情况，事件传递顺序：
+log信息看出,正常情况,事件传递顺序：
 经理 –> 组长 –> 你,先执行dispatchTouchEvent（分发）,再执行onInterceptTouchEvent（拦截）
 
 事件处理顺序：
 你 –> 组长 –> 经理,事件处理都是执行onTouchEvent（处理）。
 
-事件传递返回值：true，拦截,交给自己的onTouchEvent处理;false,不拦截,传给下属。
+事件传递返回值：true,拦截,交给自己的onTouchEvent处理;false,不拦截,传给下属。
 
 事件处理返回值：true,自己搞定,不用上报上司;false,上报上司处理。
 
 初始返回都是false。
 
-事件传递,dispatchTouchEvent一般不太会改写,只关心onInterceptTouchEvent。
+事件传递,dispatchTouchEvent一般不太会重写,只关心onInterceptTouchEvent。
+
+
 经理觉得这个任务太简单,自己处理
+
 
 即MotionEventViewGroupA里onInterceptTouchEvent返回true，我们看下log信息：
 
@@ -841,6 +850,8 @@ listView.setOnScrollListener(new OnScrollListener() {
 上面的代码提供了判断了ListView滑动方向判断的方法。
 
 ## ListView的扩展
+
+![全部的效果图](http://7xljei.com1.z0.glb.clouddn.com/listviewewxtension.gif)
 
 ### 具有弹性的ListView
 
