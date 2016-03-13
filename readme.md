@@ -5241,7 +5241,7 @@ Acticity的暂停与恢复过程: 当栈顶的Activity部分不可见后,就会�
 
 ### Activity的停止过程
 
-栈顶的Activity部分不可见时,实际上后续会有两可能,从部分不可见到部分可见,也就是恢复过程；从部分不可见到完全不可见,
+栈顶的Activity部分不可见时,实际上后续会有两可能,从部分不可见到部分可见,也就是恢复过程;从部分不可见到完全不可见,
 也就是停止过程。
 
 系统在当前Activity不可见的时候,总会调用onPause()方法。
@@ -5376,3 +5376,166 @@ finishOnTaskLaunch与clearTaskOnTouch属性类似,只不过clearTaskOnTouch作�
 * alwaysRetainTaskState
 
 alwaysRetainTaskState属性给Task一道“免试金牌”,如果将Activity的这个属性设置为True,那么该Activity所在的Task将不接受任何清理命令,一直爆出当前Task状态。
+
+# Android系统信息与安全机制
+
+## 获取系统信息
+
+* android.os.Build
+
+* SystemProperty
+
+```java
+public class SystemInfoActivity extends AppCompatActivity {
+
+    private TextView tvBuild;
+    private TextView sysTv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_system_info);
+        tvBuild = (TextView) findViewById(R.id.tvBuild);
+        sysTv = (TextView) findViewById(R.id.sysTv);
+        initBuild();
+        initSysPro();
+    }
+
+    private void initSysPro() {
+        String version = System.getProperty("os.version");
+        String name = System.getProperty("os.name");
+        String arch = System.getProperty("os.arch");
+        String userHome = System.getProperty("user.home");
+        String userName = System.getProperty("user.name");
+        String userDir = System.getProperty("user.dir");
+        String userTimezone = System.getProperty("user.timezone");
+        String pathSeparator = System.getProperty("path.separator");
+        String lineSeparator = System.getProperty("line.separator");
+        String fileSeparator = System.getProperty("file.separator");
+        String javaVendorUrl = System.getProperty("java.vendor.url");
+        String javaClassPath = System.getProperty("java.class.path");
+        String javaClassVersion = System.getProperty("java.class.version");
+        String javaVendor = System.getProperty("java.vendor");
+        String javaVersion = System.getProperty("java.version");
+        String javaHome = System.getProperty("java.home");
+        sysTv.setText("-----------------------" + "\n" +
+
+        "OS版本:" + version + "\n" +
+        "OS名称:" + name + "\n" +
+        "OS架构:" + arch + "\n" +
+        "Home属性:" + userHome + "\n" +
+        "Name属性:" + userName + "\n" +
+        "Dir属性:" + userDir + "\n" +
+        "时区:" + userTimezone + "\n" +
+        "路径分隔符:" + pathSeparator + "\n" +
+        "行分隔符:" + lineSeparator + "\n" +
+        "文件分隔符:" + fileSeparator + "\n" +
+        "javaVendorUrl属性:" + javaVendorUrl + "\n" +
+        "javaClassPath路径:" + javaClassPath + "\n" +
+        "javaClass版本:" + javaClassVersion + "\n" +
+        "javaVendor属性:" + javaVendor + "\n" +
+        "Java版本:" + javaVersion + "\n" +
+        "JavaHome属性:" + javaHome
+        );
+    }
+
+    private void initBuild() {
+        String board = Build.BOARD;
+        String brand = Build.BRAND;
+        String[] abis = Build.SUPPORTED_ABIS;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < abis.length; i++) {
+            sb.append(abis[i] + "\n");
+        }
+        String device = Build.DEVICE;
+        String display = Build.DISPLAY;
+        String fingerprint = Build.FINGERPRINT;
+        String serial = Build.SERIAL;
+        String id = Build.ID;
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        String hardware = Build.HARDWARE;
+        String product = Build.PRODUCT;
+        String tags = Build.TAGS;
+        String type = Build.TYPE;
+        String codename = Build.VERSION.CODENAME;
+        String incremental = Build.VERSION.INCREMENTAL;
+        String release = Build.VERSION.RELEASE;
+        int sdkInt = Build.VERSION.SDK_INT;
+        String host = Build.HOST;
+        String user = Build.USER;
+        long time = Build.TIME;
+        tvBuild.setText("android.os.Build获取的信息如下:\n"
+        +"主板:" + board + "\n"
+        +"系统定制商:" + brand + "\n"
+        +"CPU指令集:" + sb.toString() + "\n"
+        +"设备参数:" + device + "\n"
+        +"显示屏参数:" + display + "\n"
+        +"唯一编号:" + fingerprint + "\n"
+        +"硬件序列号:" + serial + "\n"
+        +"修订版本列表:" + id + "\n"
+        +"硬件制造商:" + manufacturer + "\n"
+        +"版本:" + model + "\n"
+        +"硬件名:" + hardware + "\n"
+        +"手机产品名:" + product + "\n"
+        +"描述Build的标签:" + tags + "\n"
+        +"Build的类型:" + type + "\n"
+        +"当前开发代号:" + codename + "\n"
+        +"源码控制版本号:" + incremental + "\n"
+        +"版本字符串:" + release + "\n"
+        +"版本号:" + sdkInt + "\n"
+        +"Host值:" + host + "\n"
+        +"User名:" + user + "\n"
+        +"编译时间:" + time + "\n"
+        );
+    }
+}
+```
+
+
+## Apk应用信息
+
+* PackageManager
+* ActivityManager
+
+在AndroidManifest文件中,Activity的信息是通过ActivityInfo类来封装的;整个Manifest文件中节点的信息是通过PackageInfo类来进行封装的;此外还有ServiceInfo、ApplicationInfo、ResolveInfo等。
+其中ResolveInfo封装的是包含信息的上一级信息,所以它可以返回ActivityInfo、ServiceInfo等包含的信息,它经常用来帮助我们找到那些包含特定Intent条件的信息,如带分享功能、播放功能的应用。
+
+PackageManager侧重于获取应用的包信息,而ActivityManager侧重于获取运行的应用程序的信息。
+PackageManager常用的方法：
+getPackageManger、getApplicationInfo、getApplicationIcon、getInstalledApplications、getInstalledPackages、queryIntentActivities、queryIntentServices、resolveActivity、resolveService等
+
+ActivityManager封装了不少对象,每个对象都保存着一些重要信息。
+
+* ActivityManager.MemoryInfo：关于系统内存的信息,例如availMem(系统可用内存)、totalMem(总内存)等;
+* Debug.MemoryInfo：该MemoryInfo主要用于统计进程下的内存信息;
+* RunningAppProceeInfo：运行进程的信息,存储的是与进程相关的信息,例如processName、pid、uid等;
+* RunningServiceInfo：运行服务的信息,存储的是服务进程的信息,例如activeSince(第一次被激活时间)等。
+
+## packages.xml文件(位于/data/system目录下)
+在系统初始化的时候,PackageManager的底层实现类PackageManagerService会去扫描系统中的一些特定的目录,并解析其中的apk文件,最后把它获得的应用信息保存到packages.xml文件中,当系统中的应用安装、删除或者升级时,它也会被更新。
+
+## Android安全机制
+五道防线：
+
+* 代码安全机制——代码混淆proguard
+* 应用接入权限机制——AndroidManifest文件权限声明、权限检查机制
+系统检查操作者权限的顺序：首先,判断permission名称,如果为空则直接返回PERMISSION_DENIED;其次,判断Uid,如果uid为0或者为System Service的uid,不做权限控制,如果uid与参数中的请求uid不同,那么返回PERMISSION_DENIED;最后,通过调用PackageManagerService.checkUidPermission方法判断该uid是否具有相应的权限,该方法会去xml的权限列表和系统级的platform.xml中进行查找。
+* 应用签名机制——数字证书：系统不会安装没有签名的app,只有拥有相同数字签名的app才会在升级时被认为是同一个app
+* Linux内核层安全机制——Uid、访问权限控制
+* Android虚拟机沙箱机制——沙箱隔离：每个app运行在单独的虚拟机中,与其他应用完全隔离
+
+## apk反编译
+使用apktool、dex2jar、jd-gui三个工具反编译查看应用源码
+
+## apk加密
+proguard不仅可以用来混淆代码（用无意义的字母来重命名类、方法和属性等）,还可以删除无用的类、字段、方法和属性,以及删除无用的注释,最大限度地优化字节码文件。
+下面是常见的proguard配置,其中minifyEnabled属性控制是否启动proguard;proguardFiles属性用于配置混淆文件,它分为两部分,一个是系统默认的混淆文件,它位于<sdk>/tools/proguard/proguard-android.txt;另一个是自定义的混淆文件,可以在项目的app文件夹下找到该文件,在该文件中定义引入的第三方依赖包的混淆规则。
+```
+buildTypes {
+    release {
+        minifyEnabled false
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+}
+```

@@ -13,6 +13,7 @@
       <module fileurl="file://$PROJECT_DIR$/dragview/dragview.iml" filepath="$PROJECT_DIR$/dragview/dragview.iml" />
       <module fileurl="file://$PROJECT_DIR$/listviewdemo/listviewdemo.iml" filepath="$PROJECT_DIR$/listviewdemo/listviewdemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/scrollerdemo/scrollerdemo.iml" filepath="$PROJECT_DIR$/scrollerdemo/scrollerdemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/systeminformation/systeminformation.iml" filepath="$PROJECT_DIR$/systeminformation/systeminformation.iml" />
       <module fileurl="file://$PROJECT_DIR$/viewmechanism/viewmechanism.iml" filepath="$PROJECT_DIR$/viewmechanism/viewmechanism.iml" />
       <module fileurl="file://$PROJECT_DIR$/viewonmeasure/viewonmeasure.iml" filepath="$PROJECT_DIR$/viewonmeasure/viewonmeasure.iml" />
     </modules>
