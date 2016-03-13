@@ -48,9 +48,9 @@ View和ViewGroup之间采用了`组合设计模式`,可以使得"部分-整体"�
 
 当我们运行程序的时候,有一个setContentView()方法,Activity其实不是显示视图（直观上感觉是它）,实际上Activity调用了
 PhoneWindow的setContentView()方法,然后加载视图,将视图放到这个Window上,而Activity其实构造的时候初始化的是Window（PhoneWindow）,
-Activity其实是个控制单元，即可视的人机交互界面。打个比喻：
+Activity其实是个控制单元,即可视的人机交互界面。打个比喻：
 
-Activity是一个工人，它来控制Window;Window是一面显示屏，用来显示信息;View就是要显示在显示屏上的信息,
+Activity是一个工人,它来控制Window;Window是一面显示屏,用来显示信息;View就是要显示在显示屏上的信息,
 这些View都是层层重叠在一起（通过infalte()和addView()）放到Window显示屏上的。
 而LayoutInfalter就是用来生成View的一个工具,XML布局文件就是用来生成View的原料。再来说说代码中具体的执行流程
 
@@ -60,11 +60,11 @@ Activity是一个工人，它来控制Window;Window是一面显示屏，用来�
 getWindow().setContentView(LayoutInflater.from(this).inflate(R.layout.main, null));
 ```
 
-即运行程序后，Activity会调用PhoneWindow的setContentView()来生成一个Window,
+即运行程序后,Activity会调用PhoneWindow的setContentView()来生成一个Window,
 而此时的setContentView就是那个最底层的View。然后通过LayoutInflater.infalte()方法加载布局生成View对象并通过addView()方法
 添加到Window上,(一层一层的叠加到Window上)。
 
-所以，Activity其实不是显示视图，View才是真正的显示视图。
+所以,Activity其实不是显示视图,View才是真正的显示视图。
 
 注：一个Activity构造的时候只能初始化一个Window(PhoneWindow),
 另外这个PhoneWindow有一个"ViewRoot",这个"ViewRoot"是一个View或ViewGroup,是最初始的根视图,然后通过addView方法将View一个个层叠到ViewRoot上,这些层叠的View最终放在Window这个载体上面。
@@ -138,7 +138,7 @@ public class MyView extends View {
 
 ## 自定义控件
 
-自定义控件的时候遇到一个问题，详见[这里](http://chenfuduo.me/2016/03/01/onMeasure%E6%89%A7%E8%A1%8C%E6%AC%A1%E6%95%B0%E7%9A%84%E9%97%AE%E9%A2%98/)
+自定义控件的时候遇到一个问题,详见[这里](http://chenfuduo.me/2016/03/01/onMeasure%E6%89%A7%E8%A1%8C%E6%AC%A1%E6%95%B0%E7%9A%84%E9%97%AE%E9%A2%98/)
 
 这个问题所有的讨论在[这里](https://github.com/android-cn/android-discuss/issues/386)可以看到。
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 几个容易混淆的方法,参见代码的注释。参考：
 [scrollTo、scrollBy、getScrollX、getScrollY这4个方法的含义](http://blog.csdn.net/xiaoguochang/article/details/8655210)
-[关于View的ScrollTo， getScrollX 和 getScrollY](http://www.xuebuyuan.com/2013505.html)
+[关于View的ScrollTo, getScrollX 和 getScrollY](http://www.xuebuyuan.com/2013505.html)
 [图解Android View的scrollTo(),scrollBy(),getScrollX(), getScrollY()](http://blog.csdn.net/bigconvience/article/details/26697645)
 
 这里实现一个类似AndroidScrollView的自定义ViewGroup。
@@ -397,14 +397,14 @@ public class MyViewGroup extends ViewGroup {
 
 关于Scroller的用法,参考这个文章。
 
-[Android Scroller完全解析，关于Scroller你所需知道的一切 ](http://blog.csdn.net/guolin_blog/article/details/48719871)
+[Android Scroller完全解析,关于Scroller你所需知道的一切 ](http://blog.csdn.net/guolin_blog/article/details/48719871)
 
 
 ## 事件拦截机制分析
 
 事件拦截机制,这里只是做了简单的分析。
 
-为了方便了解整个事件传递的机制，我们设计一个场景：
+为了方便了解整个事件传递的机制,我们设计一个场景：
 
 ![事件拦截机制分析](http://7xljei.com1.z0.glb.clouddn.com/MotionEvent.png)
 
@@ -589,7 +589,7 @@ log信息看出,正常情况,事件传递顺序：
 经理觉得这个任务太简单,自己处理
 
 
-即MotionEventViewGroupA里onInterceptTouchEvent返回true，我们看下log信息：
+即MotionEventViewGroupA里onInterceptTouchEvent返回true,我们看下log信息：
 
 ```
 MotionEventViewGroupA dispatchTouchEventA
@@ -614,7 +614,7 @@ MotionEventViewGroupA onTouchEventA
 组长干完了活,没你啥事了。以上对事件的分发、拦截的分析。
 你迫于压力,辞职不干了,任务闲置
 
-即MotionEventViewC里onTouchEvent返回true，我们看下log信息：
+即MotionEventViewC里onTouchEvent返回true,我们看下log信息：
 
 ```
 MotionEventViewGroupA dispatchTouchEventA
@@ -626,7 +626,7 @@ MotionEventViewC onTouchEventC
 ```
 
 事件处理到你这里就结束了。
-组长觉得你任务完成太烂，不敢上报
+组长觉得你任务完成太烂,不敢上报
 
 即MotionEventViewB里onTouchEvent返回true,我们看下log信息：
 
@@ -658,7 +658,7 @@ MotionEventViewGroupB onTouchEventB
 ### 使用ViewHolder模式提高效率
 
 ViewHolder模式充分利用ListView的视图缓存机制,避免了每次调用getView()的时候都去通过findViewById()实例化控件。
-效率与不使用相比,效率提高50%以上。只需要在自定义Adapter中定义内部ViewHolder类，代码如下：
+效率与不使用相比,效率提高50%以上。只需要在自定义Adapter中定义内部ViewHolder类,代码如下：
 ```java
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -688,7 +688,7 @@ ViewHolder模式充分利用ListView的视图缓存机制,避免了每次调用g
 ### 设置分割线
 
 xml中
-//设置分割线透明，一般在item用view设置自己的分割线
+//设置分割线透明,一般在item用view设置自己的分割线
 ```xml
 android:divider="@null"
 ```
@@ -720,7 +720,7 @@ listView.smoothScrollToPosition(position);
 ### 动态修改ListView
 
 ```java
-//当数据源改变时，只需要调用此方法即可改变ListView展示的内容
+//当数据源改变时,只需要调用此方法即可改变ListView展示的内容
 adapter.notifyDataSetChanged();
 ```
 
@@ -809,7 +809,7 @@ listView.setOnScrollListener(new OnScrollListener() {
                     //正在滚动时
                     break;
                 case SCROLL_STATE_FLING:
-                    //手指抛动，惯性滑动时
+                    //手指抛动,惯性滑动时
                     break;
                 }
 
@@ -990,11 +990,11 @@ public class MyActivity extends Activity {
         if (mAnimator != null && mAnimator.isRunning()) {
             mAnimator.cancel();
         }
-        //mToolbar.getTranslationY()获取View的绝对位置，
+        //mToolbar.getTranslationY()获取View的绝对位置,
         Log.e("MyActivity","transtionY=============="+mToolbar.getTranslationY()+",height========="+mToolbar.getHeight());
-        if (flag == 0) {//show toolbar down,从mToolbar.getTranslationY()位置，移动到当前位置 y ,
+        if (flag == 0) {//show toolbar down,从mToolbar.getTranslationY()位置,移动到当前位置 y ,
             mAnimator = ObjectAnimator.ofFloat(mToolbar, "translationY", mToolbar.getTranslationY(), 0);
-        } else {//hide toolbar up，从当前位置，移动到mToolbar.getTranslationY()位置 y
+        } else {//hide toolbar up,从当前位置,移动到mToolbar.getTranslationY()位置 y
             mAnimator = ObjectAnimator.ofFloat(mToolbar, "translationY", mToolbar.getTranslationY(), -mToolbar.getHeight());
         }
         mAnimator.start();
@@ -1115,7 +1115,7 @@ public class FocusListViewAdapter extends BaseAdapter {
 
 [android之位置坐标](http://blog.csdn.net/zxc123e/article/details/41869833)
 
-Android中，将屏幕最左上角的顶点作为Android坐标系的原点,从这个点向右是X轴正方向,从这个点向下是Y轴正方向。
+Android中,将屏幕最左上角的顶点作为Android坐标系的原点,从这个点向右是X轴正方向,从这个点向下是Y轴正方向。
 
 ![Android坐标系](http://7xljei.com1.z0.glb.clouddn.com/androidzuobiao.png)
 
@@ -1521,7 +1521,7 @@ Scroller类提供了computeScrollOffset()方法来判断是否完成了整个滑
 
 唯一需要注意的是invalidate()方法,因为只能在computeScroll()方法中获取模拟过程的scrollX和scrollY坐标,但computeScroll()不会自动调用,
 只能通过invalidate()->draw()->computeScroll()来间接调用computeScroll(),所以需要在上述代码中调用invalidate(),
-实现循环获取scrollX和scrollY的目的。模拟过程结束后,scroller.computeScrollOfset()方法会返回 false,从而中断循环，完成整个平滑移动的过程。
+实现循环获取scrollX和scrollY的目的。模拟过程结束后,scroller.computeScrollOfset()方法会返回 false,从而中断循环,完成整个平滑移动的过程。
 
 * 第三步,startScroll开启模拟过程
 
@@ -1781,13 +1781,13 @@ public class MyDragView11 extends FrameLayout {
 * 分辨率
 
 分辨率就是手机屏幕的像素点数,一般描述成屏幕的"宽×高",安卓手机屏幕常见的分辨率有480×800、720×1280、1080×1920等。
-720×1280表示此屏幕在宽度方向有720个像素，在高度方向有1280个像素。
+720×1280表示此屏幕在宽度方向有720个像素,在高度方向有1280个像素。
 
 * 屏幕大小
 
 屏幕大小是手机对角线的物理尺寸,以英寸(inch)为单位。比如某某手机为"5寸大屏手机",就是指对角线的尺寸,5寸×2.54厘米/寸=12.7厘米。
 
-* 密度(dpi,dots per inch;或PPI，pixels per inch)
+* 密度(dpi,dots per inch;或PPI,pixels per inch)
 
 从英文顾名思义,就是每英寸的像素点数,数值越高当然显示越细腻。假如我们知道一部手机的分辨率是1080×1920,屏幕大小是5英寸,
 通过宽1080和高1920,根据勾股定理,我们得出对角线的像素数大约是2203,那么用2203除以5就是此屏幕的密度了,计算结果是440。
@@ -1878,7 +1878,7 @@ Paint画笔也是绘图中一个非常重要的元素。
 
 Canvas家族成员
 
-* DrawPoint，绘制点
+* DrawPoint,绘制点
 
 ```java
 canvas.drawPoint(x,y,paint);
@@ -1886,11 +1886,11 @@ canvas.drawPoint(x,y,paint);
 canvas.drawPoints(pts,paint);
 ```
 
-* DrawLine，绘制直线
+* DrawLine,绘制直线
 ```java
 canvas.drawLine(startX,startY,endX,endY,paint);
 ```
-* DrawLines，绘制多条直线
+* DrawLines,绘制多条直线
 ```java
 float[] pts = {startX1,startX2,endX1,endX2,...,startXn,startYn,endXn,endYn};
 canvas.drawLines(pts,point);
@@ -1924,12 +1924,12 @@ Panit.Style.FILL + useCenter(true);
 //4.绘制实心弧形
 Panit.Style.FILL + useCenter(false);
 ```
-* DrawOval，绘制椭圆
+* DrawOval,绘制椭圆
 ```java
 //通过椭圆的外接矩形来绘制椭圆
 canvas.drawOval(left,top,right,bottom,paint);
 ```
-* DrawText，绘制文本
+* DrawText,绘制文本
 ```java
 canvas.drawText(text,startX,startY,paint);
 ```
@@ -1987,7 +1987,7 @@ Shape可以说是XML绘图的精华所在。Shape功能十分强大,无论是扁
         android:right="20dp"
         android:bottom="20dp" />
 
-    <size  //指定大小，一般用imageview配合scaleType属性使用
+    <size  //指定大小,一般用imageview配合scaleType属性使用
         android:width="20dp"
         android:height="20dp" />
 
@@ -2062,7 +2062,7 @@ Selector的作用在于实现静态绘图中的事件反馈,通过给不同的�
 
 </selector>
 ```
-Selector也可以使用Shape作为它的Item，实现具有点击反馈效果的Selector
+Selector也可以使用Shape作为它的Item,实现具有点击反馈效果的Selector
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schema.android.com/apk/res/android >
@@ -2340,14 +2340,14 @@ ColorMatrix hueMatrix=new ColorMatrix();
       hueMatrix.setRotate(2, hue);
 ```
 
-* 饱和度：//参数即为饱和度，当饱和度为0时图像就变成灰图像了。
+* 饱和度：//参数即为饱和度,当饱和度为0时图像就变成灰图像了。
 
 ```java
 ColorMatrix saturationMatrix=new ColorMatrix();
       saturationMatrix.setSaturation(saturation);
 ```
 
-* 亮度：//当三原色以相同比例进行混合的时候，就会显示出白色，从而调节亮度。
+* 亮度：//当三原色以相同比例进行混合的时候,就会显示出白色,从而调节亮度。
 
 ```java
 ColorMatrix lumMatrix=new ColorMatrix();
@@ -3143,13 +3143,13 @@ public class ImageMatrixActivity extends AppCompatActivity {
 drawBitmapMesh(Bitmap bitmap,int meshWidth,int meshHeight,float[] verts,
 float vertOffset,int[] colors,int colorOffset,Paint paint);
 ```
-方法可以把图像分成一个一个的小块进行处理，其中各个参数的含义如下：
+方法可以把图像分成一个一个的小块进行处理,其中各个参数的含义如下：
 
 * bitmap——将要操作的图像
 * meshWidth——需要的横向网格数
 * meshHeight——需要的纵向网格数
 * verts——网格交叉点坐标数组
-* verftOffset——数组中开始跳过的（x，y）坐标数目
+* verftOffset——数组中开始跳过的（x,y）坐标数目
 * 其中meshWidth和meshHeight以及verts的对应关系为：
 
 ```java
@@ -3677,11 +3677,11 @@ PathDashPathEffect.Stylestyle)。
 shape则是指填充图,advance指每个图形间的间距,phase为绘制时的偏移量,style为该类自由的枚举值,
 有三种情况：Style.ROTATE、Style.MORPH和
 Style.TRANSLATE。其中ROTATE的情况下,线段连接处的图形转换以旋转到与下一段移动方向相一致的角度进行转转,
-MORPH时图形会以发生拉伸或压缩等变形的情况与下一段相连接,TRANSLATE时，图形会以位置平移的方式与下一段相连接。
+MORPH时图形会以发生拉伸或压缩等变形的情况与下一段相连接,TRANSLATE时,图形会以位置平移的方式与下一段相连接。
 
 * ComposePathEffect：
 
-组合效果，这个类需要两个PathEffect参数来构造一个实例,ComposePathEffect (PathEffect outerpe,PathEffect innerpe),表现时,
+组合效果,这个类需要两个PathEffect参数来构造一个实例,ComposePathEffect (PathEffect outerpe,PathEffect innerpe),表现时,
 会首先将innerpe表现出来,然后再在innerpe的基础上去增加outerpe的效果。
 
 ## SurfaceView
@@ -3706,7 +3706,7 @@ SurfaceHolderCallback接口的三个回调方法
 ```java
 @Override
 public void surfaceCreated(SurfaceHolder holder) {
-  //做一些初始化操作，例如开启子线程通过循环来实现不停地绘制
+  //做一些初始化操作,例如开启子线程通过循环来实现不停地绘制
 }
 
 @Override
@@ -3720,7 +3720,7 @@ public void surfaceDestroyed(SurfaceHolder holder) {
 
 * 初始化SurfaceView
 
-初始化SurfaceHolder对象，并设置Callback
+初始化SurfaceHolder对象,并设置Callback
 ```java
 private void initView() {
     mHolder = getHolder();
@@ -3808,7 +3808,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             draw();
         }
         long end = System.currentTimeMillis();
-        // 50 - 100ms，经验值
+        // 50 - 100ms,经验值
         if (end - start < 100) {
             try {
                 Thread.sleep(100 - (end - start));
@@ -4038,7 +4038,7 @@ public class SimpleDrawWithSurfaceView  extends SurfaceView implements SurfaceHo
             draw();
         }
         long end = System.currentTimeMillis();
-        // 50 - 100ms，经验值
+        // 50 - 100ms,经验值
         if (end - start < 100) {
             try {
                 Thread.sleep(100 - (end - start));
@@ -4639,7 +4639,7 @@ textview.animate().x(500).y(500).setDuration(5000)
 ## 布局动画
 布局动画是作用在ViewGroup上的,给ViewGroup添加view时添加动画过渡效果。
 * 简易方式（但是没有什么效果）：在xml中添加如下属性 android:animateLayoutChanges="true
-* 通过LayoutAnimationController来自定义子view的过渡效果，下面是一个常见的使用例子：
+* 通过LayoutAnimationController来自定义子view的过渡效果,下面是一个常见的使用例子：
 
 ```java
  LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ll);
@@ -4652,8 +4652,8 @@ textview.animate().x(500).y(500).setDuration(5000)
 
 # 自定义动画
 
-创建自定义动画就是要实现它的`applyTransformation`的逻辑，不过通常还需要覆盖父类的initialize方法来实现初始化工作。
-下面是一个模拟电视机关闭的动画，
+创建自定义动画就是要实现它的`applyTransformation`的逻辑,不过通常还需要覆盖父类的initialize方法来实现初始化工作。
+下面是一个模拟电视机关闭的动画,
 ```java
 public class CustomTV extends Animation {
 
@@ -4735,7 +4735,7 @@ SVG是什么：
 
 ### <path>标签
 
-使用<path>标签创建SVG，就像用指令的方式来控制一只画笔。标签所支持的指令有以下几种：
+使用<path>标签创建SVG,就像用指令的方式来控制一只画笔。标签所支持的指令有以下几种：
 
 * M=moveto(M X,Y)：将画笔移动到指定的坐标位置,但未发生绘制。
 * L=lineto(L X,Y)：画直线到指定的坐标位置。
@@ -4775,7 +4775,7 @@ FLAG2为1时表顺时针,0位逆时针,X、Y为终点坐标。
 android:width="200dp"
 android:height="200dp"//控制SVG图形的具体大小,height与width的比例需和viewportHeight与viewportWidth的相同,不然会变形
 android:viewportHeight="100"
-android:viewportWidth="100">//图形划分的比例，这里指划分100*100，绘制图形使用坐标（50,50）即为中心点
+android:viewportWidth="100">//图形划分的比例,这里指划分100*100,绘制图形使用坐标（50,50）即为中心点
  <group
         android:name="test"
         android:rotation="0">
@@ -5159,3 +5159,222 @@ public class PropertyAnimDropViewActivity extends AppCompatActivity {
     </LinearLayout>
 </LinearLayout>
 ```
+
+# Activity与Activity调用栈分析
+
+## Activity
+
+Activity作为四大组件中出现频率最高的组件,我们在Android的各个地方都能看见它的影子。了解Activity,
+对于开发高质量的应用是非常有益的。
+
+### 起源
+
+Activity是与用户交互的第一接口,它提供了一个用户完成指令的窗口。当开发者创建Activity之后,
+通过调用setContentView(view)方法来给该Activity指定一个显示的界面,并以此为基础提供给用户交互的接口。
+系统采用Activity栈的方式来管理Activity。
+
+### Activity形态
+
+Activity一个最大的特点就是拥有多种形态,它可以在多种形态间进行切换,以此来控制自己的生命周期。
+
+* Active/Running
+这时候,Activity出于Activity栈的最顶层,可见,并与用户进行交互。
+
+* Pause
+当Activity失去焦点,被一个新的非全屏的Activity或者一个透明的Activity放置在栈顶时,Activity就转化为Paused形态。
+但它只是失去了与用户交互的能力,所有状态信息、成员变量都还保持着,只有在系统内存极低的情况下,才会被系统回收掉。
+
+* Stopped
+如果一个Activity被另一个Activity完全覆盖,那么Activity就会进入Stopped形态。此时,它不再可见,
+但却依然保持了所有状态信息和成员变量。
+
+* Killed
+当Activity被系统回收掉或者Activity从来没有创建过,Activity就出于Killed形态。
+
+由此可见,用户的不同动作,会让Activity在这四种状态间切换。而开发者,虽然可以控制Activity如何"生",
+却无法空着Activity何时"死"。
+### 生命周期
+
+谷歌给了我们一张图来揭示Activity的生命周期,他希望Activity能被开发者所控制,而不是变成一匹脱缰的野马。
+
+![生命周期](http://7xljei.com1.z0.glb.clouddn.com/0_1314838777He6C.gif)
+![生命周期](http://7xljei.com1.z0.glb.clouddn.com/basic-lifecycle.png)
+
+
+开发者当然不必实现所有的生命周期方法,但知道每一个生命周期状态的含义,可以让我们更好的掌控Activity,
+让它能更好地完成你所期望的效果。
+
+上图中列举了Activity生命周期的全部状态,但其中只有三个状态是稳定的,而其他状态都是过渡状态,很快就会结束。
+
+* Resume
+这个状态,也就是上节中的Active/Running状态,此时,Activity出于Activity栈顶,处理用户的交互。
+
+* Paused
+当Activity的一部分被挡住的时候进入这个状态,这个状态下的Activity不会接收用户输入。
+
+* Stopped
+当Activity完全被覆盖时进入这个状态,此时Activity不可见,仅在后台运行。
+
+### Acticity的启动和销毁过程
+
+Activity的启动和销毁过程： 在系统调用onCreate()之后,就会马上调用onStart(),然后继续调用onResume()
+以进入Resumed状态,最后就会停在Resumed状态,完成启动。系统会调用onDestroy()来结束一个Activity的声明周期让它回到
+Killed形态。
+
+* onCreate()中：创建基本的UI元素。
+* onPause()与onStop()：清除Activity的资源、避免浪费。
+* onDestroy()中：因为引用会在Activity销毁的时候销毁,而线程不会,所以清除开启的线程。
+
+* 启动: onCreate() -> onStart() -> onResume()
+* 销毁: onPause() -> onStop() -> onDestroy()
+
+### Acticity的暂停与恢复过程
+
+Acticity的暂停与恢复过程: 当栈顶的Activity部分不可见后,就会导致Activity进入Pause状态,此时就会调用onPause()方法,
+当结束阻塞后,就会调用onResume()方法来恢复到Resume状态。
+
+* onPause()： 释放系统资源,如Camera、sensor、receivers。
+* onResume()： 需要重新初始化onPause()中释放的资源。
+
+* 暂停：onResume() -> onPause()
+* 恢复：onPause() -> onResume()
+
+### Activity的停止过程
+
+栈顶的Activity部分不可见时,实际上后续会有两可能,从部分不可见到部分可见,也就是恢复过程；从部分不可见到完全不可见,
+也就是停止过程。
+
+系统在当前Activity不可见的时候,总会调用onPause()方法。
+系统在当前Activity由不可见到可见时,都会调用onStart()方法。
+### Activity的重新创建过程
+
+如果你的系统长时间处于stopped状态而且此时系统需要更多内存或者系统内存极为紧张时,系统就会回收你的Activity,
+而此时系统为了补偿你,会将Activity状态通过onSaveInstanceState()方法保存到Bundle对象中,当然你也可以增加额外的键值对
+存入Bundle对象以保存这些状态。当你需要重新创建这些Activi的时候,
+保存的Bundle对象就会传递到Activity的onRestoreInstanceState()方法与onCreate()方法中,这也就是onCreate()方法中
+参数—Bundle savaedInstanceState的来源。
+
+Activity重新创建过程:
+* Resumed(visible) ->onSavaInstanceState() -> Destroyed
+* Created ->onRestoreInstanceState() -> Resumed(visible)
+
+不过这里需要注意的是onSaveInstanceState()方法并不是每次当Activity离开前台时都会调用的,如果用户使用finish()方法
+结束了Acticity,则不会调用。而且Android系统已经默认实现类控件的状态缓存,以此来减少开发者需要实现的缓存逻辑。
+
+## Android任务栈简介
+
+一个Android应用程序功能通常会被拆分为多个Activity,而各个Activity之间通过Intent进行连接,而Android系统,
+通过栈结构来保存整个App的Activity,栈底的元素是整个任务栈的发起者。一个合理的任务调度栈不仅是性能的保证,
+更是提供性能的基础。
+
+当一个App启动时,如果当前环境中部存在该App的任务栈,那么系统就会创建一个任务栈。此后,这个App所启动的Acticity都将在
+这个任务栈中被管理,这个栈也被称为一个Task,即表示若干个Activity的集合,他们组合在一起形成一个Task。
+另外,需要特别注意的是,一个Task中的Activity可以来自不同的App,同一个App的Activity也肯能不在一个Task中。
+
+根据Activity在当前栈结构的位置,来决定该Activity的状态。正常情况下的Android任务栈,当一个Activity启动了另一个
+Activity的时候,新启动的Activity就会置于任务栈的顶端,并处于活动状态,而启动它的Activity虽然功成身退,但依然保留在
+任务栈中,处于停止恢复活动状态,当用户按下返回键或者调用finish()方法时,系统会移除顶部Activity,
+让后面的Activity恢复活动状态。
+
+## Activity启动模式
+
+当然,世界不可能一直这么"和谐",可以给Activity设置一些"特权",来打破这种"和谐"的模式。这种特权,
+就是通过在AndroidManifest文件中的属性android:launchMode来设置或者是通过Intent的flag来设置的。
+
+Android设计者在AndroidManifest文件中设计了四周启动模式
+
+* standard
+* singleTop
+* singleTask
+* singleInstance
+
+### standard
+
+默认的启动模式,如果不指定Activity的启动模式,则使用这种方式启动Activity。这种启动模式每次都会创建新的实例,
+每次点击standard模式创建Activity后,都会创建新的MainActivity覆盖在原Activity上。
+
+### singleTop
+
+如果指定启动Activity为singleTop模式,那么在启动时,系统会判断当前栈顶Activity是不是要启动的Activity,
+如果是则不创建新的Activity而直接引用这个Activity;如果不是则创建新的Activity。
+这种启动模式通常适应于接收到消息后显示的界面,例如QQ接收到消息后弹出Acticity,如果一次来10条消息,
+总不能一次弹出10个Activity。
+
+这种启动模式虽然不会创建新的实例,但是系统仍然会在Activity启动时调用onNewIntent()方法。
+例如：如果当前任务栈中有A、B、C三个Activity,而且C的启动模式是singleTop的,那么这时候如果再次启动C,
+那么系统的就不会创建新的实例,而是会调用C的onNewIntent()方法,当前任务栈中依然是A、B、C三个Activity;
+如果B的启动模式是singleTop的,那么这时候如果C启动的是B,则会创建一个全新的B,当前任务栈为A、B、C、B。
+
+### singleTask
+
+采用该加载模式时,Activity在同一个Task内只有一个实例。
+
+singleTask与singleTop模式类似,只不过singleTop是检测栈顶元素是否是需要启动的Activity,
+而sigleTask是检测整个Activity栈中是否存在当前需要启动的Activity。如果存在,则将该Activity置于栈顶,
+并将该Activity以上的Activity都销毁。
+
+如果要启动的Activity不存在,那么系统将会创建该实例,并将其加入Task栈顶
+如果将要启动的Activity已存在,且存在栈顶,那么此时与singleTop模式的行为相同
+如果将要启动的Activity存在但是没有位于栈顶,那么此时系统会把位于该Activity上面的所有其他Activity全部移除Task,
+从而使得该目标Activity位于栈顶。
+上述是指在同一个App中启动这个singleTask的Activity,如果是其他程序以singleTask模式来启动Activity,
+那么它将创建一个新的任务栈。需要注意的是,如果启动模式为singleTask的Activity已经在后台一个任务栈中了,
+那么启动后,后台的这个任务栈将会一起被切换到前台,如下图所示。
+
+![singleTask](http://7xljei.com1.z0.glb.clouddn.com/54b4b55d0001b4a705000281.jpg)
+
+当Activity2启动ActivityY(启动模式为singleTask)时,它所在的Task都被切换到前台,且按返回键返回时,
+也会先返回ActivityY所在Task的Activity。
+
+可以发现,使用这个模式创建的Activity不是在新的任务栈中被打开,就是将已打开的Activity切换到前台,
+所以这种启动模式通常可以用来退出整个应用：将主Activity设为singleTask模式,然后在要退出的Activity中转到主Activity,
+从而将主Activity之上的Activity都清除,然后重写主Activity的onNewIntent()方法,在方法中加入一句finish(),
+将最后一个Activity结束掉。
+
+
+### singleInstance
+
+在该加载模式下,无论哪个Task中启动目标Activity,只会创建一个目标Acticity实例且会用一个全新的Task栈来装载该
+Activity实例。
+
+当系统采用singleInstance模式加载Activity时,分为以下两种情况：
+
+如果将要启动的Activity不存在,那么系统将会先创建一个全新的Task,再创建目标Activity实例并将该Activity实例放入此
+全新的Task中。
+
+如果将要启动的Activity已经存在,那么无论它位于哪个应用程序、哪个Task中,系统都会把该Acticity所在的Task转到前台,
+从而使该Activity显示出来。
+这种启动模式常用于需要与程序分离的界面,如在SetupWizard中调用紧急呼叫,就是使用这种启动模式。
+例如闹铃提醒,将闹铃提醒与闹铃设置分离
+
+## Intent Flag启动模式
+
+系统提供两种方式来设置一个Activity的启动模式,下面要介绍的就是通过设置Intent的Flag来设置一个Activity的启动模式。
+
+* Intent.FLAG_ACTIVITY_NEW_TASK
+使用一个新的Task来启动一个Activity,但启动的每个Activity都将在一个新的Task中。该Flag通常使用在从Service中启动Activity的场景,由于在Service中并不存在Activity栈,所有使用该Flag来创建一个新的Activity栈,并创建新的Activity实例。
+
+* Intent.FLAG_ACTIVITY_SINGLE_TOP
+使用singleTop模式来启动一个Activity,与制定android:lanchMode="singleTop"效果相同。
+
+* Intent.FLAG_ACTIVITY_CLEAR_TOP
+使用singleTask模式来启动一个Activity,与制定android:lanchMode="singleTask"效果相同。
+
+* Intent.FLAG_ACTIVITY_NO_HISTORY
+使用这种模式启动Activity,当该Acticity启动其他Activi后,该Activity就消失了,不会保留在Activity栈中,例如A-B,B中以这种模式启动C,C再启动D,则当前Activity栈为ABD。
+
+## 清空任务栈
+
+系统提供了清楚任务栈的方法将一个Task全部清楚。通常情况下,可以在AndroidManifest文件中标签中使用以下几种属性来清理任务栈。
+
+* clearTaskOnTouch
+
+clearTaskOnTouch,就是在每次返回该Activity时,都将该Activity之上的所有Activity清除。通过这个属性,可以让这个Task每次在初始化的时候,都只有这一个Activity。
+
+* finishOnTaskLaunch
+
+finishOnTaskLaunch与clearTaskOnTouch属性类似,只不过clearTaskOnTouch作用在别人身上,而finishOnTaskLaunch作用在自己身上。通过这个属性,当离开这个Activity所处的Task,那么用户再返回时,该Activity就会被finish掉。
+
+* alwaysRetainTaskState
+
+alwaysRetainTaskState属性给Task一道“免试金牌”,如果将Activity的这个属性设置为True,那么该Activity所在的Task将不接受任何清理命令,一直爆出当前Task状态。
