@@ -5375,7 +5375,7 @@ finishOnTaskLaunch与clearTaskOnTouch属性类似,只不过clearTaskOnTouch作�
 
 * alwaysRetainTaskState
 
-alwaysRetainTaskState属性给Task一道“免试金牌”,如果将Activity的这个属性设置为True,那么该Activity所在的Task将不接受任何清理命令,一直爆出当前Task状态。
+alwaysRetainTaskState属性给Task一道"免试金牌",如果将Activity的这个属性设置为True,那么该Activity所在的Task将不接受任何清理命令,一直爆出当前Task状态。
 
 # Android系统信息与安全机制
 
@@ -5539,3 +5539,70 @@ buildTypes {
     }
 }
 ```
+
+# Android性能优化
+
+## 布局优化
+人眼感觉的流畅需要画面的帧数达到每秒40帧到60帧,那么差不多每16ms系统就要对UI进行渲染和重绘。
+(1)android系统提供了检测UI渲染时间的工具,"开发者选项"-"Profile GPU rendering"-"On screen as bars",这个时候屏幕上将显示一些条形图,如下左图所示,每条柱状线都包含三部分,蓝色代表测量绘制Display List的时间,红色代表OpenGL渲染Display List所需要的时间,黄色代表CPU等待GPU处理的时间。中间的绿色横线代表VSYNC时间16ms,需要尽量将所有条形图都控制在这条绿线之下。
+(2)过度绘制（Overdraw）也是很浪费CPU/GPU资源的,系统也提供了检测工具Debug GPU Overdraw来查看界面overdraw的情况。该工具会使用不同的颜色绘制屏幕,来指示overdraw发生在哪里以及程度如何,其中：
+没有颜色： 意味着没有overdraw。像素只画了一次。
+蓝色： 意味着overdraw 1倍。像素绘制了两次。大片的蓝色还是可以接受的（若整个窗口是蓝色的,可以摆脱一层）。
+绿色： 意味着overdraw 2倍。像素绘制了三次。中等大小的绿色区域是可以接受的但你应该尝试优化、减少它们。
+浅红： 意味着overdraw 3倍。像素绘制了四次,小范围可以接受。
+暗红： 意味着overdraw 4倍。像素绘制了五次或者更多。这是错误的,要修复它们。
+
+![androidheros_gpu](http://7xljei.com1.z0.glb.clouddn.com/androidheros_gpu.png)
+
+
+![androidheros_overdraw](http://7xljei.com1.z0.glb.clouddn.com/androidheros_overdraw.png)
+
+(3)优化布局层级,Google在文档中建议View树的高度不宜超过10层
+避免嵌套过多无用布局：
+* 使用标签重用layout
+如果需要在标签中覆盖类似原布局中的android:layout_xxx的属性,就必须在标签中同时指定android:layout_width和android:layout_height属性。
+* 使用实现view的延迟加载
+ViewStub是一个非常轻量级的组件,它不仅不可见,而且大小为0。
+ViewStub和View.GONE有啥区别?
+它们的共同点是初始时都不会显示,但是前者只会在显示时才去渲染整个布局,而后者在初始化布局树的时候就已经添加到布局树上了,相比之下前者的布局具有更高的效率。
+
+(4)Hierarchy Viewer：查看视图树的工具
+
+## 内存优化
+通常情况下我们所说的内存是指手机的RAM,它包括以下几部分：
+* 寄存器：寄存器处于CPU内部,在程序中无法控制；
+* 栈：存放基本数据类型和对象的引用；
+* 堆：存放对象和数组,有虚拟机GC来管理；
+* 静态存储区域(static field)：在固定的位置存放应用程序运行时一直存在的数据,Java在内存中专门划分了一个静态存储区域来管理一些特殊的数据变量,如静态的数据变量；
+* 常量池(constant pool)：虚拟机必须为每个被装在的类维护一个常量池,常量池就是这个类所用的常量的一个有序集合,包括直接常量（基本类型、string）和对其他类型、字段和方法的符号引用。
+
+内存优化实例
+* Bitmap优化
+
+> * 使用适当分辨率和大小的图片；
+及时回收内存：从Android 3.0开始,Bitmap被放置到了堆中,其内存由GC管理,所以不用手动调用bitmap.recycle()方法进行释放了；
+使用图片缓存：设计内存缓存和磁盘缓存可以更好地利用Bitmap。
+
+* 代码优化
+
+> * 使用静态方法,它比普通方法会提高15%左右的访问速度;
+尽量不要使用枚举,少用迭代器；[我还不知道为什么]
+对Cursor、Receiver、Sensor、File等对象,要非常注意对它们的创建、回收与注册、解注册；
+使用SurfaceView来替代view进行大量的、频繁的绘图操作；
+尽量使用视图缓存,而不是每次都执行inflate方法解析视图。
+
+## 其他的辅助工具
+
+> * Lint工具：代码提示工具,可以用来发现代码中隐藏的一些问题
+Memory Monitor工具：内存监视工具
+TraceView工具：可视化性能调查工具,它用来分析TraceView日志
+MAT工具：内存分析工具
+dumpsys命令：该命令可以列出android系统相关的信息和服务状态,可使用的配置参数很多,常见的有：
+
+* activity：显示所有Activity栈的信息；
+* meminfo：显示内存信息；
+* battery：显示电池信息；
+* package：显示包信息；
+* wifi：显示wifi信息；
+* alarm：显示alarm信息；
+* procstats：显示内存状态。
