@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import drawable.ChatListActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void scrollToChat(View view){
-        Intent intent = new Intent(MainActivity.this,ChatListActivity.class);
+        Intent intent = new Intent(MainActivity.this, ChatListActivity.class);
         startActivity(intent);
     }
 
