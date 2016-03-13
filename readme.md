@@ -5250,9 +5250,7 @@ Acticity的暂停与恢复过程: 当栈顶的Activity部分不可见后,就会�
 
 如果你的系统长时间处于stopped状态而且此时系统需要更多内存或者系统内存极为紧张时,系统就会回收你的Activity,
 而此时系统为了补偿你,会将Activity状态通过onSaveInstanceState()方法保存到Bundle对象中,当然你也可以增加额外的键值对
-存入Bundle对象以保存这些状态。当你需要重新创建这些Activi的时候,
-保存的Bundle对象就会传递到Activity的onRestoreInstanceState()方法与onCreate()方法中,这也就是onCreate()方法中
-参数—Bundle savaedInstanceState的来源。
+存入Bundle对象以保存这些状态。当你需要重新创建这些Activity的时候,保存的Bundle对象就会传递到Activity的onRestoreInstanceState()方法与onCreate()方法中,这也就是onCreate()方法中参数—Bundle savaedInstanceState的来源。
 
 Activity重新创建过程:
 * Resumed(visible) ->onSavaInstanceState() -> Destroyed
@@ -5339,10 +5337,10 @@ Activity实例。
 
 当系统采用singleInstance模式加载Activity时,分为以下两种情况：
 
-如果将要启动的Activity不存在,那么系统将会先创建一个全新的Task,再创建目标Activity实例并将该Activity实例放入此
+* 如果将要启动的Activity不存在,那么系统将会先创建一个全新的Task,再创建目标Activity实例并将该Activity实例放入此
 全新的Task中。
 
-如果将要启动的Activity已经存在,那么无论它位于哪个应用程序、哪个Task中,系统都会把该Acticity所在的Task转到前台,
+* 如果将要启动的Activity已经存在,那么无论它位于哪个应用程序、哪个Task中,系统都会把该Acticity所在的Task转到前台,
 从而使该Activity显示出来。
 这种启动模式常用于需要与程序分离的界面,如在SetupWizard中调用紧急呼叫,就是使用这种启动模式。
 例如闹铃提醒,将闹铃提醒与闹铃设置分离
