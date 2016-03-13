@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void scrollToChat(View view){
-        Intent intent = new Intent(MainActivity.this, ChatListActivity.class);
+        Intent intent = new Intent(MainActivity.this, ChatListActivity1.class);
         startActivity(intent);
     }
 

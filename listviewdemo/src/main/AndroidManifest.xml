@@ -19,7 +19,7 @@
         <activity android:name=".ScrollToHideActivity" />
         <activity android:name="drawable.ChatListActivity" />
         <activity android:name=".FocusListViewActivity" />
-        <activity android:name=".ChatListActivity"></activity>
+        <activity android:name=".ChatListActivity1"></activity>
     </application>
 
 </manifest>
