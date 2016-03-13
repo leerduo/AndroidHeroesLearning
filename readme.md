@@ -5547,6 +5547,7 @@ buildTypes {
 (1)android系统提供了检测UI渲染时间的工具,"开发者选项"-"Profile GPU rendering"-"On screen as bars",这个时候屏幕上将显示一些条形图,如下左图所示,每条柱状线都包含三部分,蓝色代表测量绘制Display List的时间,红色代表OpenGL渲染Display List所需要的时间,黄色代表CPU等待GPU处理的时间。中间的绿色横线代表VSYNC时间16ms,需要尽量将所有条形图都控制在这条绿线之下。
 (2)过度绘制（Overdraw）也是很浪费CPU/GPU资源的,系统也提供了检测工具Debug GPU Overdraw来查看界面overdraw的情况。该工具会使用不同的颜色绘制屏幕,来指示overdraw发生在哪里以及程度如何,其中：
 没有颜色： 意味着没有overdraw。像素只画了一次。
+
 蓝色： 意味着overdraw 1倍。像素绘制了两次。大片的蓝色还是可以接受的（若整个窗口是蓝色的,可以摆脱一层）。
 绿色： 意味着overdraw 2倍。像素绘制了三次。中等大小的绿色区域是可以接受的但你应该尝试优化、减少它们。
 浅红： 意味着overdraw 3倍。像素绘制了四次,小范围可以接受。
